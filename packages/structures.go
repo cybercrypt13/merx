@@ -73,6 +73,7 @@ type PO struct {
 	LastFour        		string
 	ShipMethod      		string
 	Items           		[]item
+	Units						[]unit
 }
 
 type item struct {
@@ -81,9 +82,20 @@ type item struct {
 	Qty        int
 }
 
+type unit struct {
+	VendorCode 	string
+	OrderCode 	string
+	ModelNumber string
+	Year			int
+	Colors 		string
+	Details 		string
+	Qty        	int
+	ForCustomer	int
+}
+
 type AcceptedOrder struct {
 	DealerPO  string
-	MerxPO    string
+	InternalID    string
 	DealerKey string
 	ItemNotes []ItemNote
 }
@@ -138,11 +150,9 @@ type inventory struct {
 	DealerKey   string
 }
 
-type POStatus struct {
-	MerxPO      string
+type POStatus 	struct {
+	InternalID  string
 	DealerPO    string
-	Status      int
-	EstShipDate string
 	DealerKey   string
 	Boxes       []box
 	Pending     []penditem
@@ -151,6 +161,8 @@ type POStatus struct {
 type box struct {
 	BoxNumber      string
 	TrackingNumber string
+	VendorInvoice 	string
+	DueDate		 	string
 	Items          []shipitem
 }
 

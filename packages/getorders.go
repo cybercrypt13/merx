@@ -41,7 +41,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetOrders(db *sql.DB, date string, allorders string) (code int, resp []byte, err error) {
+func GetOrder(db *sql.DB, date string, allorders string) (code int, resp []byte, err error) {
 	//10.01.2013 naj - validate the date parameter
 	if date != "" {
 		matched, err := regexp.MatchString("^2[0-1][0-9]{2}-(0[1-9])|(1[0-2])-(0[1-9])|(1[0-9])|(2[0-9])|(3[0-1])", date)

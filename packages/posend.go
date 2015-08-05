@@ -74,19 +74,11 @@ func (p *POSend) VerifyPackage() error {
 			currentpo = c.DealerPONumber
 		}
 
-		if len(c.Items) == 0 {
-			errtext += currentpo + " Missing Items Array\n"
-		} else {
-			for i := 0; i < len(c.Items); i++ {
-				if c.Items[i].PartNumber == "" {
-					errtext += currentpo + " Missing Part Number\n"
-				}
-
-				if c.Items[i].Qty < 1 {
-					errtext += currentpo + " Missing Qty\n"
-				}
-			}
-		}
+		//07.21.2015 ghh - ( we need to verify that we have a blank
+		//item and unit array and if so return error
+		if len(c.Items) == 0 && len(c.Units) == 0{
+			errtext += currentpo + " PO Has No Parts Or Units\n"
+		} 
 	}
 
 	if errtext != "" {
@@ -115,81 +107,6 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 		//06.02.2013 naj - stick the current PO into a new variable to keep the name short.
 		c := p.PurchaseOrders[i]
 
-		//10.04.2013 naj - for now Merx will not use a preloaded price file and will just accept orders
-		//good := make([]Parts, 0, len(c.Items))
-		//bad := make([]ItemNote, 0, len(c.Items))
-		//y := 0
-		//z := 0
-		//for x := 0; x < len(c.Items); x++ {
-		//	//07.12.2013 naj - Get the vendorid
-		//	vendorid, err := common.GetVendorID(db, p.bsvkeyid, c.Items[x].VendorCode)
-		//	if err != nil {
-		//		if err.Error() == "No VendorCode found" {
-		//			bad = bad[0 : len(bad)+1]
-		//			bad[y].VendorCode = c.Items[x].VendorCode
-		//			bad[y].PartNumber = c.Items[x].PartNumber
-		//			bad[y].Note = err.Error()
-		//			y++
-		//			continue
-		//		} else {
-		//			return nil, err
-		//		}
-		//	}
-
-		//	//07.12.2013 naj - Get the part record
-		//	itemid, superseded, nla, err := common.GetPart(db, vendorid, c.Items[x].PartNumber)
-		//	if err != nil {
-		//		if err.Error() == "Unable to locate part number" {
-		//			bad = bad[0 : len(bad)+1]
-		//			bad[y].VendorCode = c.Items[x].VendorCode
-		//			bad[y].PartNumber = c.Items[x].PartNumber
-		//			bad[y].Note = err.Error()
-		//			y++
-		//			continue
-		//		} else {
-		//			return nil, err
-		//		}
-		//	}
-
-		//	switch {
-		//	case nla:
-		//		bad = bad[0 : len(bad)+1]
-		//		bad[y].VendorCode = c.Items[x].VendorCode
-		//		bad[y].PartNumber = c.Items[x].PartNumber
-		//		bad[y].NLA = 1
-		//		y++
-		//	case superseded != "":
-		//		good = good[0 : len(bad)+1]
-		//		good[z].ItemID = itemid
-		//		good[z].VendorCode = c.Items[x].VendorCode
-		//		good[z].PartNumber = superseded
-		//		good[z].Qty = c.Items[x].Qty
-		//		z++
-		//		bad = bad[0 : len(bad)+1]
-		//		bad[y].VendorCode = c.Items[x].VendorCode
-		//		bad[y].PartNumber = c.Items[x].PartNumber
-		//		bad[y].Superceded = 1
-		//		bad[y].Note = "Part has been superseded by " + superseded
-		//		y++
-		//	default:
-		//		good = good[0 : len(good)+1]
-		//		good[z].ItemID = itemid
-		//		good[z].VendorCode = c.Items[x].VendorCode
-		//		good[z].PartNumber = c.Items[x].PartNumber
-		//		good[z].Qty = c.Items[x].Qty
-		//		z++
-
-		//	}
-
-		//}
-		////07.09.2013 naj - if we have no good parts the we do not want to accept this purchase order.
-		//if len(good) == 0 {
-		//	continue
-		//}
-		////07.09.2013 naj - if we have bad parts make sure we put the details into the response object.
-		//if len(bad) > 0 {
-		//	r[i].ItemNotes = bad
-		//}
 
 		//06.02.2013 naj - put the current PONumber into the response
 		r = r[0 : len(r)+1]
@@ -305,6 +222,24 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 												Quantity) value (?, ?, ?, ?)`, 
 												poid, c.Items[j].PartNumber, c.Items[j].VendorCode, 
 												c.Items[j].Qty)
+			if err != nil {
+				//10.04.2013 naj - rollback transaction
+				_ = transaction.Rollback()
+				return nil, err
+			}
+		}
+
+
+		//07.21.2015 ghh - now loop through the list of units and add them to the PO
+		for j := 0; j < len(c.Units); j++ {
+			//06.02.2013 naj - attach the parts to the current PO.
+			_, err := transaction.Exec(`insert into PurchaseOrderUnits (POID, ModelNumber, Year,
+												VendorCode, OrderCode, Colors, Details 
+												Quantity) value (?, ?, ?, ?, ?, ?, ?, ?)`, 
+												poid, c.Units[j].ModelNumber, c.Units[j].Year, 
+												c.Units[j].VendorCode, c.Units[j].OrderCode,
+												c.Units[j].Colors, c.Units[j].Details,
+												c.Units[j].Qty)
 			if err != nil {
 				//10.04.2013 naj - rollback transaction
 				_ = transaction.Rollback()

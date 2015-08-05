@@ -41,43 +41,48 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetPOStatus(dealerid int, merxpo string, db *sql.DB) (code int, resp []byte, err error) {
-	//06.05.2013 naj - make sure we have a merxpo
-	if merxpo == "" {
+//07.22.2015 ghh - we're only looking for the internalid that was returned
+//when they placed their order.  So we're just going to look it up and
+//make sure its linked to the proper dealer account to prevent checking for
+//orders you don't own.
+func GetOrderStatus(dealerid int, internalid string, db *sql.DB) 
+							(code int, resp []byte, err error) {
+	//06.05.2013 naj - make sure we have an internalid
+	if internalid == "" {
 		code = http.StatusBadRequest
-		err = errors.New("Missing MerxPO")
+		err = errors.New("Missing InternalID field")
 		return
 	}
 
-	matched, err := regexp.MatchString("^MERX-.*", merxpo)
+	//matched, err := regexp.MatchString("^MERX-.*", merxpo)
 
 	if err != nil {
 		code = http.StatusInternalServerError
 		return
 	}
 
-	if !matched {
-		code = http.StatusBadRequest
-		err = errors.New("Invalid PO format")
-		return
-	}
+	//if !matched {
+	//	code = http.StatusBadRequest
+	//	err = errors.New("Invalid PO format")
+	//	return
+	//}
 
 	//06.03.2013 naj - initialize some variables
 	var r POStatus
 	code = http.StatusOK
-	r.MerxPO = merxpo
+	r.InternalID = internalid
 
-	//06.03.2013 naj - strip of the MERX- prefix on the ponumber
-	poid := strings.TrimPrefix(merxpo, "MERX-")
-	poid = strings.TrimLeft(poid, "0")
 
 	//if temp is not null the we will convert it to a string and load it into r.EstShipDate
-	err = db.QueryRow("select PONumber, Status from PurchaseOrders where DealerID = ? and POID = ?", dealerid, poid).Scan(&r.DealerPO, &r.Status)
+	err = db.QueryRow(`select DealerPONumber from PurchaseOrders 
+							where DealerID = ? and POID = ?`, 
+							dealerid, 
+							poid).Scan(&r.DealerPO)
 
 	switch {
 	case err == sql.ErrNoRows:
 		code = http.StatusNotFound
-		err = errors.New("Could locate PO: " + merxpo)
+		err = errors.New("Could locate PO: " + internalid )
 		return
 	case err != nil:
 		code = http.StatusInternalServerError
@@ -85,14 +90,17 @@ func GetPOStatus(dealerid int, merxpo string, db *sql.DB) (code int, resp []byte
 	}
 
 	//06.03.2013 naj - if the status is not 4 then we have no shipment data yet, so we can just return what data we do have.
-	if r.Status < 4 {
-		resp, err = json.Marshal(r)
-		if err != nil {
-			code = http.StatusInternalServerError
-			return
-		}
-		return
-	}
+	//07.22.2015 ghh - removed because new flow will allow requesting order updates anytime you want.
+	//had to do this because its possible some parts of this order have already shipped and we still
+	//need to allow retrieving information on remaining parts
+	//if r.Status < 4 {
+	//	resp, err = json.Marshal(r)
+	//	if err != nil {
+	//		code = http.StatusInternalServerError
+	//		return
+	//	}
+	//	return
+	//}
 
 	//06.03.2013 naj - now get all parts and the associated boxes
 	rows, err := db.Query("select ifnull(a.VendorCode, ''), ifnull(a.PartNumber, ''), ifnull(b.BoxID, 0), "+

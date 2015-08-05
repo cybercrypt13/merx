@@ -97,18 +97,57 @@ CREATE TABLE `Items` (
   `VendorID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the VendorCode table',
   `PartNumber` varchar(30) NOT NULL DEFAULT '' COMMENT 'The part number',
   `Description` varchar(75) NOT NULL DEFAULT '' COMMENT 'The part description',
-  `SupersessionID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the ItemID of the superseeding part',
+  `ManufPartNumber` varchar(25) comment 'original manufacturer part number',
+  `ManufName` varchar(50) comment 'original manufacturer name',
+  `SupersessionNumber` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the ItemID of the superseeding part',
   `NLA` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'No longer available flag, 0 = false, 1 = true',
+  `CloseOut` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Will not be available after inventory depleted 0 = false, 1 = true',
   `PriceCode` varchar(3) NOT NULL DEFAULT '' COMMENT 'Holds the price code that applies to this part',
   `Cost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',
   `List` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the suggested retail price of the item',
-  `QtyAvail` int(11) NOT NULL DEFAULT '0' COMMENT 'Quantity Available',
   `Category` varchar(50) NOT NULL DEFAULT '' COMMENT 'Hold category info',
   PRIMARY KEY (`ItemID`),
   KEY `iPart` (`VendorID`,`PartNumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the manufacturer/suppliers price file';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `ItemStock`
+--
+
+DROP TABLE IF EXISTS `ItemStock`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ItemsStock` (
+  `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
+  `WarehouseID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Warehouses',
+  `Qty` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',
+  PRIMARY KEY (`ItemID`, `WarehouseID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the stock qty for each warehouse';
+
+
+
+DROP TABLE IF EXISTS `ItemCost`;
+CREATE TABLE `ItemsCost` (
+  `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
+  `DealerID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Warehouses',
+  `DealerCost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',
+  PRIMARY KEY (`ItemID`, `DealerID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds cost per dealer per item';
+
+--
+-- Table structure for table `Warehouses`
+--
+
+DROP TABLE IF EXISTS `Warehouses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Warehouses` (
+  `WarehouseID` int(10) unsigned NOT NULL auto_increment primary key COMMENT 'Warehouse ID for supported warehouses',
+  `WarehouseName` varchar(50) NOT NULL COMMENT 'name of different warehouses',
+  `WarehouseState` varchar(5) not null comment 'state the warehouse resides in',
+  KEY ( `WarehouseName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the different supported warehouses';
 --
 -- Table structure for table `PriceCodesLink`
 --
@@ -186,6 +225,25 @@ CREATE TABLE `PurchaseOrderShipped` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+
+
+
+drop table if exists `PurchaseOrderUnits`;
+create table PurchaseOrderUnits( POUnitID int unsigned not null auto_increment primary key, 
+POID int unsigned not null comment 'links to PurchaseOrder table',
+VendorCode varchar(5) comment 'holds specific code for vendor', 
+OrderCode varchar(25) comment 'vendor specific part number for this unit', 
+ModelNumber varchar(50) comment 'vendor model number', 
+Year int unsigned default 0 comment 'year if available', 
+Colors text comment 'list of colors for unit', 
+Details text comment 'special notes', 
+Quantity int unsigned comment 'how many of this model is being ordered', 
+ForCustomer tinyint unsigned default 0 comment '0=for stock, 1=for customer' ) 
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit order information';
+
+
+
 --
 -- Table structure for table `PurchaseOrders`
 --
@@ -200,8 +258,6 @@ CREATE TABLE `PurchaseOrders` (
   `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
   `POReceivedDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Stores the purchase order date received',
-  `POPulledDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Stores the purchase order date received',
-  `POShippedDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Stores the purchase order date received',
   `BillToFirstName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
   `BillToLastName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
   `BillToCompanyName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
@@ -247,6 +303,8 @@ CREATE TABLE `ShippedBoxes` (
   `BoxID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for each box shipped',
   `BoxNumber` varchar(25) NOT NULL DEFAULT '1' COMMENT 'Stores the box number assigned by the vendor',
   `TrackingNumber` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the boxes tracking number',
+  `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
+  `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
   PRIMARY KEY (`BoxID`),
   KEY `iTracking` (`TrackingNumber`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='This table stores the tracking data for each box shipped.';
@@ -280,6 +338,9 @@ CREATE TABLE `VendorCredentials` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Stores the authorized vendor key';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

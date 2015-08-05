@@ -37,8 +37,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"merx/packages"
-	"merx/common"
+	"nizex.com/merx/common"
+	"nizex.com/merx/packages"
 )
 
 //04.09.2012 ghh - this function is threaded and receives each
@@ -61,15 +61,15 @@ func handlePackage(	req *http.Request,
 	if req.Method == "GET" {
 		urlquery := req.URL.Query()
 
-		//07.12.2013 naj - get purchase order status
-		if strings.ToLower(url) == "postatus" {
-			code, json, err = packages.GetPOStatus(dealerid, urlquery.Get("MerxPO"), db)
+		//07.12.2013 ghh - get purchase order status
+		if strings.ToLower(url) == "getorderstatus" {
+			code, json, err = packages.GetOrderStatus(dealerid, urlquery.Get("InternalID"), db)
 			if err != nil {
 				return
 			}
 		}
 
-		//07.12.2013 naj - check inventory
+		//07.12.2013 ghh - check inventory
 		if strings.ToLower(url) == "inventoryverify" {
 			code, json, err = packages.GetInventoryLocal(dealerid, 
 							bsvkeyid, 
@@ -94,6 +94,9 @@ func handlePackage(	req *http.Request,
 		//05.31.2013 naj - figure out which package to load.
 		if strings.ToLower(url) == "sendorder" {
 			pkg = new(packages.POSend)
+
+
+		}
 		}
 
 		//05.31.2013 naj - make sure we have a package
