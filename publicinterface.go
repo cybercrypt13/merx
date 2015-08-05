@@ -36,9 +36,10 @@ import (
 	"database/sql"
 	"net/http"
 	"time"
-
 	_ "github.com/go-sql-driver/mysql"
-	"merx/common"
+
+	common "merx/common"
+
 )
 
 //05.06.2015 ghh - this is the main function that is called whenever

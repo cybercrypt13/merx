@@ -38,13 +38,11 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"merx/common/readconf"
-	"merx/common/signals"
+	common "merx/common"
 )
 
 //05.28.2013 naj - declare our global variables for logging and database connection info.
-var logging *signals.LogFile
+var logging *common.LogFile
 var DBConnect string
 
 func main() {
@@ -55,7 +53,7 @@ func main() {
 	flag.Parse()
 
 	//05.24.2013 naj - read the config file
-	err := readconf.OpenConfigFile(*confpath)
+	err := common.OpenConfigFile(*confpath)
 
 	if err != nil {
 		fmt.Println(err)
@@ -63,10 +61,10 @@ func main() {
 	}
 
 	//05.24.2013 naj - get the the log file path
-	logfile := readconf.GetConfig("Defaults", "LogFile", "/var/log/merx.log")
+	logfile := common.GetConfig("Defaults", "LogFile", "/var/log/merx.log")
 
 	//05.24.2013 naj - start the logging.
-	logging, err = signals.NewLog(logfile)
+	logging, err = common.NewLog(logfile)
 
 	if err != nil {
 		fmt.Println(err)
@@ -74,14 +72,14 @@ func main() {
 	}
 
 	//05.24.2013 naj - get the network settings
-	netip := readconf.GetConfig("Network", "Listen", "0.0.0.0")
-	netport := readconf.GetConfig("Network", "Port", "8000")
-	sslcert := readconf.GetConfig("Network", "SSLCert", "")
-	sslkey := readconf.GetConfig("Network", "SSLKey", "")
+	netip := common.GetConfig("Network", "Listen", "0.0.0.0")
+	netport := common.GetConfig("Network", "Port", "8000")
+	sslcert := common.GetConfig("Network", "SSLCert", "")
+	sslkey := common.GetConfig("Network", "SSLKey", "")
 
 	//09.25.2013 naj - get the admin interface settings
-	adminip := readconf.GetConfig("Network", "AdminListen", netip)
-	adminport := readconf.GetConfig("Network", "AdminPort", "9000")
+	adminip := common.GetConfig("Network", "AdminListen", netip)
+	adminport := common.GetConfig("Network", "AdminPort", "9000")
 
 	//09.25.2013 naj - make sure that the IP address and port number
 	//of the admin interface is not the same as the regular request interface.
@@ -91,12 +89,12 @@ func main() {
 	}
 
 	//05.24.2013 naj - get the database connection info
-	dbName := readconf.GetConfig("Database", "Name", "merx")
-	dbHost := readconf.GetConfig("Database", "Host", "localhost")
-	dbPort := readconf.GetConfig("Database", "Port", "3306")
-	dbUser := readconf.GetConfig("Database", "User", "")
-	dbPass := readconf.GetConfig("Database", "Password", "")
-	dbProto := readconf.GetConfig("Database", "Protocol", "tcp")
+	dbName := common.GetConfig("Database", "Name", "merx")
+	dbHost := common.GetConfig("Database", "Host", "localhost")
+	dbPort := common.GetConfig("Database", "Port", "3306")
+	dbUser := common.GetConfig("Database", "User", "")
+	dbPass := common.GetConfig("Database", "Password", "")
+	dbProto := common.GetConfig("Database", "Protocol", "tcp")
 
 	//05.24.2013 naj - make sure we have a database user and password
 	if dbUser == "" || dbPass == "" {
@@ -108,14 +106,14 @@ func main() {
 	DBConnect = dbUser + ":" + dbPass + "@"
 
 	if dbProto == "unix" {
-		dbSocket := readconf.GetConfig("Database", "Socket", "/tmp/mysql.sock")
+		dbSocket := common.GetConfig("Database", "Socket", "/tmp/mysql.sock")
 		DBConnect = DBConnect + "(" + dbSocket + ")/" + dbName + "?charset=utf8&autocommit=true"
 	} else {
 		DBConnect = DBConnect + "(" + dbHost + ":" + dbPort + ")/" + dbName + "?charset=utf8&autocommit=true"
 	}
 
 	//05.28.2013 naj - start the signal catcher.
-	go signals.SignalCatcher(servicename, logging)
+	go common.SignalCatcher(servicename, logging)
 
 	//05.28.2013 naj - start the http server
 	logging.LogError("", "Starting Merx Server")
