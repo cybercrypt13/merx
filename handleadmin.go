@@ -36,8 +36,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"nizex.com/merx/common"
-	"nizex.com/merx/packages"
+	"merx/common"
+	"merx/packages"
 )
 
 func handleAdmin(db *sql.DB, req *http.Request) (code int, data []byte, err error) {

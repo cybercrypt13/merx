@@ -37,8 +37,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"nizex.com/merx/common"
-	"nizex.com/merx/packages"
+	"merx/common"
+	"merx/packages"
 )
 
 //04.09.2012 ghh - this function is threaded and receives each

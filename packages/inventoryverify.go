@@ -36,7 +36,7 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
-	"nizex.com/merx/common"
+	"merx/common"
 )
 
 func GetInventoryLocal(dealerid int, bsvkeyid int, vendorcode string, partnum string, db *sql.DB) (code int, resp []byte, err error) {

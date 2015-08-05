@@ -38,7 +38,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"nizex.com/merx/common"
+	"merx/common"
 )
 
 //05.06.2015 ghh - this is the main function that is called whenever

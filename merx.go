@@ -39,8 +39,8 @@ import (
 	"net/http"
 	"time"
 
-	"nizex.com/readconf"
-	"nizex.com/signals"
+	"merx/common/readconf"
+	"merx/common/signals"
 )
 
 //05.28.2013 naj - declare our global variables for logging and database connection info.
