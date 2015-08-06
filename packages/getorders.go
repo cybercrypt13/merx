@@ -36,7 +36,7 @@ import (
 	//"fmt"
 	"net/http"
 	"regexp"
-	"strings"
+//	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -120,7 +120,7 @@ func GetOrder(db *sql.DB, date string, allorders string) (code int, resp []byte,
 		}
 
 		//10.03.2013 naj - format the poid and turn it into a merx po number
-		p.POID = "MERX-" + strings.Repeat("0", 5-len(poid)) + poid
+		p.POID = poid
 
 		//10.04.2013 naj - flag the current po as processing.
 		_, err = transaction.Exec("update PurchaseOrders set Status = 1 where POID = ?", poid)

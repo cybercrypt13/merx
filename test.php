@@ -1,17 +1,17 @@
 <?php
 $parts = array(
 	array(
-		"VendorCode"	=> "PRTUN",
+		"VendorID"	=> "PRTUN",
 		"PartNumber"	=> "123456",
 		"Qty"				=> 1
 	),
 	array(
-		"VendorCode"	=> "PRTUN",
+		"VendorID"	=> "PRTUN",
 		"PartNumber"	=> "12357",
 		"Qty"				=> 2
 	),
 	array(
-		"VendorCode"	=> "PRTUN",
+		"VendorID"	=> "PRTUN",
 		"PartNumber"	=> "12358",
 		"Qty"				=> 3
 	)
@@ -102,7 +102,7 @@ exit;
 */
 
 //06.03.2013 naj - inventoryverify
-$getstr = "?UUID=123&DealerKey=abc&BSVKey=abc&VendorCode=PRTUN&PartNumber=12356";
+$getstr = "?UUID=123&DealerKey=abc&BSVKey=abc&VendorID=PRTUN&PartNumber=12356";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "$url/inventoryverify$getstr");
 curl_setopt($ch, CURLOPT_POST, false);
