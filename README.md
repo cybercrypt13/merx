@@ -14,3 +14,13 @@ interested in checking out the above website for documentation and videos on how
 This source code is free to copy and distribute and can be utilized any many other industries.  We do hope that anyone wanting 
 to use the code will communicate with us at support@merxedi.com so that we can maintain a standardized API for whatever
 industries its adopted in.
+
+
+To Fork the branch on github you first need to create a fork and then check
+out your copy.  Next you will need to go into that folder and do the following
+
+####ONLY NEED TO DO THIS ONCE add an upstream to your local fork so you can pull updates made to the main project
+git remote add upstream https://github.com/cybercrypt13/merx.git
+
+####DO DAILY   pull any new updates on the main project into your fork
+git pull upstream master
