@@ -32,20 +32,6 @@ CREATE TABLE `AuthorizedBSVKeys` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Stores the authorized BSV Keys';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `BSVVendorCodeLinks`
---
-
-DROP TABLE IF EXISTS `BSVVendorCodeLinks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `BSVVendorCodeLinks` (
-  `BSVKeyID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Authorized BSV Key',
-  `VendorCode` varchar(5) NOT NULL COMMENT 'BSV Specific VendorCode',
-  `VendorID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the VendorCodes table',
-  UNIQUE KEY `iBSVCode` (`BSVKeyID`,`VendorCode`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table links BSV specific vendor codes to the VendorCodes table';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `DealerCredentials`
@@ -257,20 +243,8 @@ CREATE TABLE `PurchaseOrders` (
   `DealerID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to DealerCredentials table',
   `BSVKeyID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to BSV table',
   `DealerPONumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the client''s purchase order number',
-  `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
   `POReceivedDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Stores the purchase order date received',
-  `BillToFirstName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
-  `BillToLastName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
-  `BillToCompanyName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing contact name',
-  `BillToAddress1` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing address 1',
-  `BillToAddress2` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing address 2',
-  `BillToCity` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing city',
-  `BillToState` varchar(5) NOT NULL DEFAULT '' COMMENT 'Stores the billing state/province code',
-  `BillToZip` varchar(15) NOT NULL DEFAULT '' COMMENT 'Stores the billing postal code',
-  `BillToCountry` varchar(3) NOT NULL DEFAULT '' COMMENT 'Stores the billing country code',
-  `BillToPhone` varchar(15) NOT NULL DEFAULT '' COMMENT 'Stores the billing postal code',
-  `BillToEmail` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing postal code',
   `ShipToFirstName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
   `ShipToLastName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
   `ShipToCompanyName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
@@ -316,14 +290,14 @@ CREATE TABLE `ShippedBoxes` (
 -- Table structure for table `VendorCodes`
 --
 
-DROP TABLE IF EXISTS `VendorCodes`;
+DROP TABLE IF EXISTS `Vendors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `VendorCodes` (
+CREATE TABLE `Vendors` (
   `VendorID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each VendorCode',
-  `VendorCode` varchar(5) NOT NULL COMMENT 'Standard VendorCode',
+  `VendorName` varchar(50) NOT NULL COMMENT 'Standard VendorCode',
   PRIMARY KEY (`VendorID`),
-  UNIQUE KEY `iVendorCode` (`VendorCode`)
+  UNIQUE KEY `iVendorName` (`VendorName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table holds the standard vendor codes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -377,3 +351,4 @@ engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds 
 -- Dump completed on 2013-10-07 11:14:57
 insert into DealerCredentials values( null, '0d3d6381-0e02-11e5-9eb5-20c9d0478db9', null, now(), now(), now(), null, 1,'12345');
 insert into AuthorizedBSVKeys values( null, '108b6a78-4027-447b-9b2d-a6c9b7da72dc', 0 );
+alter table PurchaseOrders auto_increment=1000;

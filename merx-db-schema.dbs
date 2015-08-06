@@ -17,29 +17,6 @@
 				<column name="BSVKeyID" />
 			</index>
 		</table>
-		<table name="BSVVendorCodeLinks" >
-			<column name="BSVKeyID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
-				<defo>0</defo>
-				<comment><![CDATA[Links to the Authorized BSV Key]]></comment>
-			</column>
-			<column name="VendorCode" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
-				<comment><![CDATA[BSV Specific VendorCode]]></comment>
-			</column>
-			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
-				<defo>0</defo>
-				<comment><![CDATA[Links to the VendorCodes table]]></comment>
-			</column>
-			<index name="iBSVCode" unique="UNIQUE" >
-				<column name="BSVKeyID" />
-				<column name="VendorCode" />
-			</index>
-			<fk name="Fk_BSVVendorCodeLinks" virtual="y" to_schema="merx" to_table="AuthorizedBSVKeys" >
-				<fk_column name="BSVKeyID" pk="BSVKeyID" />
-			</fk>
-			<fk name="Fk_BSVVendorCodeLinks_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
-				<fk_column name="VendorID" pk="VendorID" />
-			</fk>
-		</table>
 		<table name="DealerCredentials" >
 			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
 				<comment><![CDATA[Unique key for each dealer]]></comment>
@@ -226,6 +203,9 @@
 				<column name="VendorID" />
 				<column name="PartNumber" />
 			</index>
+			<fk name="Fk_Items" virtual="y" to_schema="merx" to_table="Vendors" >
+				<fk_column name="VendorID" pk="VendorID" />
+			</fk>
 		</table>
 		<table name="PriceCodesLink" >
 			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
@@ -328,11 +308,11 @@
 			<fk name="Fk_PurchaseOrderItems" virtual="y" to_schema="merx" to_table="PurchaseOrders" >
 				<fk_column name="POID" pk="POID" />
 			</fk>
-			<fk name="Fk_PurchaseOrderItems_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
-				<fk_column name="VendorID" pk="VendorID" />
-			</fk>
 			<fk name="Fk_PurchaseOrderItems_1" virtual="y" to_schema="merx" to_table="Items" >
 				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+			<fk name="Fk_PurchaseOrderItems_0" virtual="y" to_schema="merx" to_table="Vendors" >
+				<fk_column name="VendorID" pk="VendorID" />
 			</fk>
 		</table>
 		<table name="PurchaseOrderShipped" >
@@ -408,7 +388,7 @@
 			<fk name="Fk_PurchaseOrderUnits" virtual="y" to_schema="merx" to_table="PurchaseOrders" >
 				<fk_column name="POID" pk="POID" />
 			</fk>
-			<fk name="Fk_PurchaseOrderUnits_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
+			<fk name="Fk_PurchaseOrderUnits_0" virtual="y" to_schema="merx" to_table="Vendors" >
 				<fk_column name="VendorID" pk="VendorID" />
 			</fk>
 		</table>
@@ -424,60 +404,12 @@
 				<defo>&#039;&#039;</defo>
 				<comment><![CDATA[Stores the client's purchase order number]]></comment>
 			</column>
-			<column name="VendorInvoiceNumber" type="VARCHAR" length="20" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the vendor's invoice number]]></comment>
-			</column>
 			<column name="DueDate" type="DATE" length="10" jt="91" >
 				<comment><![CDATA[Due Date Returned By Vendor]]></comment>
 			</column>
 			<column name="POReceivedDate" type="DATE" length="10" jt="91" mandatory="y" regexp_nulls="0" >
 				<defo>&#039;0000-00-00&#039;</defo>
 				<comment><![CDATA[Stores the purchase order date received]]></comment>
-			</column>
-			<column name="BillToFirstName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing contact name]]></comment>
-			</column>
-			<column name="BillToLastName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing contact name]]></comment>
-			</column>
-			<column name="BillToCompanyName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing contact name]]></comment>
-			</column>
-			<column name="BillToAddress1" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing address 1]]></comment>
-			</column>
-			<column name="BillToAddress2" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing address 2]]></comment>
-			</column>
-			<column name="BillToCity" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing city]]></comment>
-			</column>
-			<column name="BillToState" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing state/province code]]></comment>
-			</column>
-			<column name="BillToZip" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing postal code]]></comment>
-			</column>
-			<column name="BillToCountry" type="VARCHAR" length="3" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing country code]]></comment>
-			</column>
-			<column name="BillToPhone" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing postal code]]></comment>
-			</column>
-			<column name="BillToEmail" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
-				<defo>&#039;&#039;</defo>
-				<comment><![CDATA[Stores the billing postal code]]></comment>
 			</column>
 			<column name="ShipToFirstName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
 				<defo>&#039;&#039;</defo>
@@ -624,7 +556,7 @@
 			<index name="pk_UnitModel" unique="PRIMARY_KEY" >
 				<column name="ModelID" />
 			</index>
-			<fk name="Fk_UnitModel" virtual="y" to_schema="merx" to_table="VendorCodes" >
+			<fk name="Fk_UnitModel" virtual="y" to_schema="merx" to_table="Vendors" >
 				<fk_column name="VendorID" pk="VendorID" />
 			</fk>
 		</table>
@@ -643,20 +575,6 @@
 				<fk_column name="ModelID" pk="ModelID" />
 			</fk>
 		</table>
-		<table name="VendorCodes" >
-			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
-				<comment><![CDATA[Unique key for each VendorCode]]></comment>
-			</column>
-			<column name="VendorCode" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
-				<comment><![CDATA[Standard VendorCode]]></comment>
-			</column>
-			<index name="pk_VendorCodes" unique="PRIMARY_KEY" >
-				<column name="VendorID" />
-			</index>
-			<index name="iVendorCode" unique="UNIQUE" >
-				<column name="VendorCode" />
-			</index>
-		</table>
 		<table name="VendorCredentials" >
 			<column name="VendorKey" type="CHAR" length="64" jt="1" mandatory="y" regexp_nulls="0" >
 				<defo>&#039;&#039;</defo>
@@ -665,6 +583,20 @@
 			<column name="IPAddress" type="INT" length="10" jt="4" unsigned="y" >
 				<comment><![CDATA[Holds the vendors ip address]]></comment>
 			</column>
+		</table>
+		<table name="Vendors" >
+			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each VendorCode]]></comment>
+			</column>
+			<column name="VendorName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[Standard VendorCode]]></comment>
+			</column>
+			<index name="pk_Vendors" unique="PRIMARY_KEY" >
+				<column name="VendorID" />
+			</index>
+			<index name="iVendorName" unique="UNIQUE" >
+				<column name="VendorName" />
+			</index>
 		</table>
 		<table name="Warehouses" >
 			<column name="WarehouseID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
@@ -690,27 +622,24 @@
 		<entity schema="merx" name="AuthorizedBSVKeys" color="aac6f2" x="45" y="75" />
 		<entity schema="merx" name="DealerCredentials" color="aac6f2" x="45" y="195" />
 		<entity schema="merx" name="PurchaseOrderShipped" color="aac6f2" x="945" y="330" />
-		<entity schema="merx" name="BSVVendorCodeLinks" color="aac6f2" x="90" y="480" />
 		<entity schema="merx" name="PurchaseOrderBackOrder" color="aac6f2" x="945" y="480" />
-		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="960" y="60" />
-		<entity schema="merx" name="ShippedBoxes" color="aac6f2" x="675" y="345" />
-		<entity schema="merx" name="VendorCodes" color="aac6f2" x="255" y="390" />
-		<entity schema="merx" name="PurchaseOrderItems" color="aac6f2" x="720" y="75" />
 		<entity schema="merx" name="ItemCost" color="aac6f2" x="555" y="705" />
 		<entity schema="merx" name="DealerDiscountLink" color="aac6f2" x="375" y="705" />
 		<entity schema="merx" name="Warehouses" color="aac6f2" x="465" y="945" />
 		<entity schema="merx" name="ItemStock" color="aac6f2" x="210" y="705" />
 		<entity schema="merx" name="VendorCredentials" color="aac6f2" x="105" y="390" />
 		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="465" y="60" />
-		<entity schema="merx" name="Items" color="aac6f2" x="105" y="870" />
 		<entity schema="merx" name="ItemImages" color="aac6f2" x="420" y="825" />
 		<entity schema="merx" name="UnitModelImages" color="aac6f2" x="990" y="720" />
+		<entity schema="merx" name="ShippedBoxes" color="aac6f2" x="675" y="345" />
+		<entity schema="merx" name="Vendors" color="aac6f2" x="270" y="405" />
+		<entity schema="merx" name="PurchaseOrderItems" color="aac6f2" x="720" y="75" />
+		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="960" y="60" />
+		<entity schema="merx" name="Items" color="aac6f2" x="105" y="870" />
 		<entity schema="merx" name="UnitModel" color="aac6f2" x="765" y="720" />
 		<group name="Security" color="c4e0f9" >
 			<entity schema="merx" name="VendorCredentials" />
 			<entity schema="merx" name="AuthorizedBSVKeys" />
-			<entity schema="merx" name="BSVVendorCodeLinks" />
-			<entity schema="merx" name="VendorCodes" />
 			<entity schema="merx" name="DealerCredentials" />
 		</group>
 		<group name="Purchase Orders" color="66ff66" >
@@ -728,6 +657,10 @@
 			<entity schema="merx" name="DealerDiscountLink" />
 			<entity schema="merx" name="Warehouses" />
 			<entity schema="merx" name="ItemStock" />
+		</group>
+		<group name="Units" color="ffff66" >
+			<entity schema="merx" name="UnitModel" />
+			<entity schema="merx" name="UnitModelImages" />
 		</group>
 	</layout>
 </project>
