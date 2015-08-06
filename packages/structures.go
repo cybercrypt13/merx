@@ -43,6 +43,7 @@ type POSend struct {
 type PO struct {
 	POID 	         		string //only used when the vendor retrieves a PO
 	DealerID					int
+	Status					int
 	AccountNumber   		string //only used when the vendor retrieves a PO
 	PODate          		string //only used when the vendor retrieves a PO
 	DealerPONumber  		string
@@ -152,6 +153,7 @@ type inventory struct {
 
 type POStatus 	struct {
 	InternalID  string
+	Status		int
 	DealerPO    string
 	DealerKey   string
 	Boxes       []box

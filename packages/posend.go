@@ -195,7 +195,7 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 			temp = strings.Repeat("0", 5-len(temp)) + temp
 		}
 
-		r[i].MerxPO = temp
+		r[i].DealerPO = temp
 		r[i].DealerKey = dealerkey
 
 		if err != nil {

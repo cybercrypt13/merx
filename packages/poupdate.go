@@ -35,8 +35,8 @@ import (
 	"errors"
 	//"fmt"
 	"net/http"
-	"regexp"
-	"strings"
+//	"regexp"
+//	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -56,18 +56,18 @@ func (p *POUpdates) ParsePackage(pkg []byte, db *sql.DB) (code int, err error) {
 		c := p.PurchaseOrders[i]
 
 		//09.27.2013 naj - check to see if we have a Merx PO Number
-		matched, err := regexp.MatchString("^MERX-.*", c.MerxPO)
+		//matched, err := regexp.MatchString("^MERX-.*", c.InternalID)
 
 		if err != nil {
 			code = http.StatusInternalServerError
 			return code, err
 		}
 
-		if !matched || c.MerxPO == "" {
-			code = http.StatusBadRequest
-			err = errors.New("Missing MerxPO")
-			return code, err
-		}
+		//if !matched || c.InternalID == "" {
+		//	code = http.StatusBadRequest
+		//	err = errors.New("Missing Internal ID")
+		//	return code, err
+		//}
 
 		if c.Status <= 0 {
 			code = http.StatusBadRequest
@@ -90,9 +90,8 @@ func (p *POUpdates) ProcessPackage() (code int, err error) {
 	for x := 0; x < len(p.PurchaseOrders); x++ {
 		a := p.PurchaseOrders[x]
 
-		//09.27.2013 naj - get the poid
-		poid := strings.TrimPrefix(a.MerxPO, "MERX-")
-		poid = strings.TrimLeft(poid, "0")
+		//08.06.2015 ghh - ( grab the internal id to locate our po with
+		poid := a.InternalID
 
 		//09.27.2013 naj - update each PO
 		_, err := transaction.Exec("update PurchaseOrders set Status = ? where POID = ?", a.Status, poid)

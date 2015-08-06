@@ -54,7 +54,7 @@ func handleAdmin(db *sql.DB, req *http.Request) (code int, data []byte, err erro
 		switch {
 		case url == "getorders":
 			//09.26.2013 naj - vendor is pulling pending orders
-			code, data, err := packages.GetOrders(db, urlquery.Get("OrderDate"), urlquery.Get("AllOrders"))
+			code, data, err := packages.GetOrder(db, urlquery.Get("OrderDate"), urlquery.Get("AllOrders"))
 			return code, data, err
 
 		default:

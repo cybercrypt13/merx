@@ -103,8 +103,9 @@ CREATE TABLE `Items` (
   `NLA` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'No longer available flag, 0 = false, 1 = true',
   `CloseOut` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Will not be available after inventory depleted 0 = false, 1 = true',
   `PriceCode` varchar(3) NOT NULL DEFAULT '' COMMENT 'Holds the price code that applies to this part',
-  `Cost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',
-  `List` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the suggested retail price of the item',
+  `Cost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the basic cost of the item',
+  `List` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the suggested retail price of the item',
+  `MAP` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the minimum advertise price of the item',
   `Category` varchar(50) NOT NULL DEFAULT '' COMMENT 'Hold category info',
   PRIMARY KEY (`ItemID`),
   KEY `iPart` (`VendorID`,`PartNumber`)
@@ -118,7 +119,7 @@ CREATE TABLE `Items` (
 DROP TABLE IF EXISTS `ItemStock`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ItemsStock` (
+CREATE TABLE `ItemStock` (
   `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
   `WarehouseID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Warehouses',
   `Qty` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',
@@ -128,7 +129,7 @@ CREATE TABLE `ItemsStock` (
 
 
 DROP TABLE IF EXISTS `ItemCost`;
-CREATE TABLE `ItemsCost` (
+CREATE TABLE `ItemCost` (
   `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
   `DealerID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Warehouses',
   `DealerCost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the actual cost of the item',

@@ -37,8 +37,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"nizex.com/merx/common"
-	"nizex.com/merx/packages"
+	"merx/common"
+	"merx/packages"
 )
 
 //04.09.2012 ghh - this function is threaded and receives each
@@ -96,7 +96,6 @@ func handlePackage(	req *http.Request,
 			pkg = new(packages.POSend)
 
 
-		}
 		}
 
 		//05.31.2013 naj - make sure we have a package

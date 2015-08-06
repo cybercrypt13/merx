@@ -35,8 +35,8 @@ import (
 	"errors"
 	//"fmt"
 	"net/http"
-	"regexp"
-	"strings"
+//	"regexp"
+//	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -45,8 +45,7 @@ import (
 //when they placed their order.  So we're just going to look it up and
 //make sure its linked to the proper dealer account to prevent checking for
 //orders you don't own.
-func GetOrderStatus(dealerid int, internalid string, db *sql.DB) 
-							(code int, resp []byte, err error) {
+func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp []byte, err error) {
 	//06.05.2013 naj - make sure we have an internalid
 	if internalid == "" {
 		code = http.StatusBadRequest
@@ -72,17 +71,15 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB)
 	code = http.StatusOK
 	r.InternalID = internalid
 
-
 	//if temp is not null the we will convert it to a string and load it into r.EstShipDate
 	err = db.QueryRow(`select DealerPONumber from PurchaseOrders 
-							where DealerID = ? and POID = ?`, 
-							dealerid, 
-							poid).Scan(&r.DealerPO)
+							where DealerID = ? and POID = ?`,
+		dealerid, internalid).Scan(&r.DealerPO)
 
 	switch {
 	case err == sql.ErrNoRows:
 		code = http.StatusNotFound
-		err = errors.New("Could locate PO: " + internalid )
+		err = errors.New("Could locate PO: " + internalid)
 		return
 	case err != nil:
 		code = http.StatusInternalServerError
@@ -107,7 +104,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB)
 		"ifnull(b.QtyShipped, 0), ifnull(c.QtyPending, 0), ifnull(c.EstShipDate, ''), b.Cost "+
 		"from PurchaseOrderItems a left outer join PurchaseOrderShipped b on a.POItemID = b.POItemID "+
 		"left outer join PurchaseOrderBackOrder c on a.POItemID = c.POItemID where "+
-		"a.POID = ? order by b.BoxID", poid)
+		"a.POID = ? order by b.BoxID", internalid)
 	if err != nil {
 		code = http.StatusInternalServerError
 		return
@@ -194,7 +191,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB)
 			switch {
 			case err == sql.ErrNoRows:
 				code = http.StatusNotFound
-				err = errors.New("Could not locate boxes for PO:" + merxpo)
+				err = errors.New("Could not locate boxes for PO:" + internalid)
 				return
 			case err != nil:
 				code = http.StatusInternalServerError
