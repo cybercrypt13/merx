@@ -78,13 +78,13 @@ type PO struct {
 }
 
 type item struct {
-	VendorCode string
+	VendorID string
 	PartNumber string
 	Qty        int
 }
 
 type unit struct {
-	VendorCode 	string
+	VendorID 	string
 	OrderCode 	string
 	ModelNumber string
 	Year			int
@@ -102,7 +102,7 @@ type AcceptedOrder struct {
 }
 
 type ItemNote struct {
-	VendorCode string
+	VendorID string
 	PartNumber string
 	Superceded int
 	NLA        int
@@ -111,7 +111,7 @@ type ItemNote struct {
 
 type Parts struct {
 	ItemID     int
-	VendorCode string
+	VendorID string
 	PartNumber string
 	Qty        int
 }
@@ -138,7 +138,7 @@ type Dealers struct {
 }
 
 type inventory struct {
-	VendorCode  string
+	VendorID  string
 	PartNumber  string
 	Description string
 	MSRP        float32
@@ -169,14 +169,14 @@ type box struct {
 }
 
 type shipitem struct {
-	VendorCode string
+	VendorID string
 	PartNumber string
 	Qty        int
 	Cost       float32
 }
 
 type penditem struct {
-	VendorCode  string
+	VendorID  string
 	PartNumber  string
 	Qty         int
 	Cost        float32
@@ -213,7 +213,7 @@ type optiondetails struct {
 }
 
 type VehicleData struct {
-	VendorCode          string
+	VendorID          string
 	ModelNumber         string
 	ModelYear           string
 	ModelDescription    string

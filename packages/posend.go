@@ -34,7 +34,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
-	"strings"
+//	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -143,6 +143,12 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 															where POID=? `, temppoid )
 				if err != nil {
 					return nil, err
+
+				//08.06.2015 ghh - delete units from linked units table
+				result, err = transaction.Exec(`delete from PurchaseOrderUnits 
+															where POID=? `, temppoid )
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
@@ -163,16 +169,16 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 
 		//06.02.2013 naj - create the PO record in the database.
 		result, err = transaction.Exec(`insert into PurchaseOrders (
-			DealerID, DealerPONumber, POReceivedDate, BillToFirstName, BillToLastName, BillToCompanyName, 
+			DealerID, BSVKeyID, DealerPONumber, POReceivedDate, BillToFirstName, BillToLastName, BillToCompanyName, 
 			BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToZip, 
 			BillToCountry, BillToPhone, BillToEmail, 
 			ShipToFirstName, ShipToLastName, ShipToCompanyName, ShipToAddress1,
 			ShipToAddress2, ShipToCity, ShipToState, ShipToZip, ShipToCountry, 
 			ShipToPhone, ShipToEmail,  
 			PaymentMethod, LastFour, ShipMethod) values 
-			(?, ?, curdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+			(?, ?, curdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 			?, ?, ?, ?, ?, ?, ? )`, 
-			dealerid, c.DealerPONumber,
+			dealerid, c.bsvkeyid, c.DealerPONumber,
 			c.BillToFirstName, c.BillToLastName, c.BillToCompanyName, c.BillToAddress1, 
 			c.BillToAddress2, c.BillToCity, c.BillToState, c.BillToZip, c.BillToCountry, 
 			c.BillToPhone, c.BillToEmail,
@@ -191,11 +197,8 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 
 		//06.02.2013 naj - format the POID and put the assigned POID into the response
 		temp := strconv.FormatInt(poid, 10)
-		if len(temp) < 6 {
-			temp = strings.Repeat("0", 5-len(temp)) + temp
-		}
 
-		r[i].DealerPO = temp
+		r[i].InternalID = temp
 		r[i].DealerKey = dealerkey
 
 		if err != nil {
@@ -204,28 +207,24 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 			return nil, err
 		}
 
-		//10.04.2013 naj - for now Merx will not use a preloaded price file and will just accept orders
-		//for j := 0; j < len(good); j++ {
-		//	//06.02.2013 naj - attach the parts to the current PO.
-		//	_, err := db.Exec("insert into PurchaseOrderItems (POID, PartNumber, VendorCode, ItemID, Quantity)"+
-		//		"value (?, ?, ?, ?, ?)", poid, good[j].PartNumber, good[j].VendorCode, good[j].ItemID, good[j].Qty)
-		//	if err != nil {
-		//		return nil, err
-		//	}
-		//}
-
 		//06.05.2015 ghh - now loop through the items array and insert all the parts for
 		//the order
 		for j := 0; j < len(c.Items); j++ {
 			//06.02.2013 naj - attach the parts to the current PO.
-			_, err := transaction.Exec(`insert into PurchaseOrderItems (POID, PartNumber, VendorCode, 
+			_, err := transaction.Exec(`insert into PurchaseOrderItems (POID, PartNumber, VendorID, 
 												Quantity) value (?, ?, ?, ?)`, 
-												poid, c.Items[j].PartNumber, c.Items[j].VendorCode, 
+												poid, c.Items[j].PartNumber, c.Items[j].VendorID, 
 												c.Items[j].Qty)
 			if err != nil {
 				//10.04.2013 naj - rollback transaction
 				_ = transaction.Rollback()
 				return nil, err
+
+				//08.06.2015 ghh - ( now that we've written the line into the table we need to
+				//query a few things in order to build a proper response to send back.  Things
+				//we want to know are how many will ship, any supersession or other known info
+				//current cost...
+
 			}
 		}
 
@@ -234,10 +233,10 @@ func (p *POSend) ProcessPackage(dealerid int, dealerkey string) ([]byte, error) 
 		for j := 0; j < len(c.Units); j++ {
 			//06.02.2013 naj - attach the parts to the current PO.
 			_, err := transaction.Exec(`insert into PurchaseOrderUnits (POID, ModelNumber, Year,
-												VendorCode, OrderCode, Colors, Details 
+												VendorID, OrderCode, Colors, Details 
 												Quantity) value (?, ?, ?, ?, ?, ?, ?, ?)`, 
 												poid, c.Units[j].ModelNumber, c.Units[j].Year, 
-												c.Units[j].VendorCode, c.Units[j].OrderCode,
+												c.Units[j].VendorID, c.Units[j].OrderCode,
 												c.Units[j].Colors, c.Units[j].Details,
 												c.Units[j].Qty)
 			if err != nil {

@@ -111,7 +111,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 	}
 
 	//06.03.2013 naj - initialize the boxid and counter variables and a slice to hold our items
-	currentboxid := 0
+	var currentboxid int = 0
 	x := 0
 	y := 0
 	z := 0

@@ -93,7 +93,7 @@ func adminInterface(resp http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		//write the header out to the client system
-		resp.WriteHeader(code)
+		resp.WriteHeader(int(code))
 
 		//write the error contents to the client system
 		if code == http.StatusInternalServerError {
@@ -107,7 +107,7 @@ func adminInterface(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	//10.01.2013 naj - if we made it this far we have a successful request to write the response to the client
-	resp.WriteHeader(code)
+	resp.WriteHeader(int(code))
 	resp.Write(data)
 	logging.LogError("", "Admin Request Complete")
 }
