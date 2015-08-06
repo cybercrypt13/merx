@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="MySql" id="Project928160" database="MySql" >
+	<schema name="merx" catalogname="merx" defo="y" >
+		<table name="AuthorizedBSVKeys" >
+			<column name="BSVKeyID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique ID for each authorized BSV key]]></comment>
+			</column>
+			<column name="BSVKey" type="CHAR" length="64" jt="1" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[The BSV authorization key]]></comment>
+			</column>
+			<column name="BSVVendorCode" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Flag to tell merX if it needs to use the BSV specific vendor codes]]></comment>
+			</column>
+			<index name="pk_AuthorizedBSVKeys" unique="PRIMARY_KEY" >
+				<column name="BSVKeyID" />
+			</index>
+		</table>
+		<table name="BSVVendorCodeLinks" >
+			<column name="BSVKeyID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the Authorized BSV Key]]></comment>
+			</column>
+			<column name="VendorCode" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[BSV Specific VendorCode]]></comment>
+			</column>
+			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the VendorCodes table]]></comment>
+			</column>
+			<index name="iBSVCode" unique="UNIQUE" >
+				<column name="BSVKeyID" />
+				<column name="VendorCode" />
+			</index>
+			<fk name="Fk_BSVVendorCodeLinks" virtual="y" to_schema="merx" to_table="AuthorizedBSVKeys" >
+				<fk_column name="BSVKeyID" pk="BSVKeyID" />
+			</fk>
+			<fk name="Fk_BSVVendorCodeLinks_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
+				<fk_column name="VendorID" pk="VendorID" />
+			</fk>
+		</table>
+		<table name="DealerCredentials" >
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each dealer]]></comment>
+			</column>
+			<column name="DealerKey" type="VARCHAR" length="40" jt="12" >
+				<comment><![CDATA[Stores the dealer key]]></comment>
+			</column>
+			<column name="IPAddress" type="INT" length="10" jt="4" unsigned="y" >
+				<comment><![CDATA[Stores the client ip as integer]]></comment>
+			</column>
+			<column name="CreatedDateTime" type="DATETIME" length="19" jt="93" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;0000-00-00 00:00:00&#039;</defo>
+				<comment><![CDATA[When the record was created]]></comment>
+			</column>
+			<column name="UpdatedDateTime" type="DATETIME" length="19" jt="93" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;0000-00-00 00:00:00&#039;</defo>
+				<comment><![CDATA[When the record was modified]]></comment>
+			</column>
+			<column name="AccessedDateTime" type="DATETIME" length="19" jt="93" >
+				<comment><![CDATA[When the client last connected to merx]]></comment>
+			</column>
+			<column name="LastIPAddress" type="INT" length="10" jt="4" unsigned="y" >
+				<comment><![CDATA[Hold the client's last know IP Address]]></comment>
+			</column>
+			<column name="Active" type="TINYINT" length="3" jt="-6" mandatory="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Turns on or off the clients Account]]></comment>
+			</column>
+			<column name="AccountNumber" type="VARCHAR" length="35" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Holds the dealer number]]></comment>
+			</column>
+			<index name="pk_DealerCredentials" unique="PRIMARY_KEY" >
+				<column name="DealerID" />
+			</index>
+			<index name="iUUIDIPAddr" unique="NORMAL" >
+				<column name="IPAddress" />
+			</index>
+			<index name="iLogin" unique="NORMAL" >
+				<column name="DealerKey" />
+				<column name="Active" />
+			</index>
+		</table>
+		<table name="DealerDiscountLink" >
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to DealerCredentials table]]></comment>
+			</column>
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the Items table]]></comment>
+			</column>
+			<column name="Discount" type="FLOAT" jt="7" >
+				<defo>0</defo>
+				<comment><![CDATA[The discount rate]]></comment>
+			</column>
+			<index name="iDealerCode" unique="UNIQUE" >
+				<column name="DealerID" />
+				<column name="ItemID" />
+			</index>
+			<fk name="Fk_DealerDiscountLink" virtual="y" to_schema="merx" to_table="DealerCredentials" >
+				<fk_column name="DealerID" pk="DealerID" />
+			</fk>
+			<fk name="Fk_DealerDiscountLink_0" virtual="y" to_schema="merx" to_table="Items" >
+				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+		</table>
+		<table name="ItemCost" >
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each part in merX]]></comment>
+			</column>
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the Warehouses]]></comment>
+			</column>
+			<column name="DealerCost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This store the actual cost of the item]]></comment>
+			</column>
+			<index name="pk_ItemCost" unique="PRIMARY_KEY" >
+				<column name="ItemID" />
+				<column name="DealerID" />
+			</index>
+			<fk name="Fk_ItemCost" virtual="y" to_schema="merx" to_table="Items" >
+				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+		</table>
+		<table name="ItemImages" >
+			<column name="ImageID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" />
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to Model Table]]></comment>
+			</column>
+			<column name="ImageURL" type="VARCHAR" length="100" jt="12" >
+				<comment><![CDATA[URL to image of unit]]></comment>
+			</column>
+			<index name="pk_ItemImages" unique="PRIMARY_KEY" >
+				<column name="ImageID" />
+			</index>
+			<fk name="Fk_ItemImages" virtual="y" to_schema="merx" to_table="Items" >
+				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+		</table>
+		<table name="ItemStock" >
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each part in merX]]></comment>
+			</column>
+			<column name="WarehouseID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the Warehouses]]></comment>
+			</column>
+			<column name="Qty" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This store the actual cost of the item]]></comment>
+			</column>
+			<index name="pk_ItemStock" unique="PRIMARY_KEY" >
+				<column name="ItemID" />
+				<column name="WarehouseID" />
+			</index>
+			<fk name="Fk_ItemStock" virtual="y" to_schema="merx" to_table="Items" >
+				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+			<fk name="Fk_ItemStock_0" virtual="y" to_schema="merx" to_table="Warehouses" >
+				<fk_column name="WarehouseID" pk="WarehouseID" />
+			</fk>
+		</table>
+		<table name="Items" >
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each part in merX]]></comment>
+			</column>
+			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the VendorCode table]]></comment>
+			</column>
+			<column name="PartNumber" type="VARCHAR" length="30" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[The part number]]></comment>
+			</column>
+			<column name="Description" type="VARCHAR" length="75" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[The part description]]></comment>
+			</column>
+			<column name="ManufPartNumber" type="VARCHAR" length="25" jt="12" >
+				<comment><![CDATA[original manufacturer part number]]></comment>
+			</column>
+			<column name="ManufName" type="VARCHAR" length="50" jt="12" >
+				<comment><![CDATA[original manufacturer name]]></comment>
+			</column>
+			<column name="SupersessionNumber" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the ItemID of the superseeding part]]></comment>
+			</column>
+			<column name="NLA" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[No longer available flag, 0 = false, 1 = true]]></comment>
+			</column>
+			<column name="CloseOut" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Will not be available after inventory depleted 0 = false, 1 = true]]></comment>
+			</column>
+			<column name="PriceCode" type="VARCHAR" length="3" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Holds the price code that applies to this part]]></comment>
+			</column>
+			<column name="Cost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This stores the basic cost of the item]]></comment>
+			</column>
+			<column name="List" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This stores the suggested retail price of the item]]></comment>
+			</column>
+			<column name="MAP" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This store the minimum advertise price of the item]]></comment>
+			</column>
+			<column name="Category" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Hold category info]]></comment>
+			</column>
+			<index name="pk_Items" unique="PRIMARY_KEY" >
+				<column name="ItemID" />
+			</index>
+			<index name="iPart" unique="NORMAL" >
+				<column name="VendorID" />
+				<column name="PartNumber" />
+			</index>
+		</table>
+		<table name="PriceCodesLink" >
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to DealerCredentials table]]></comment>
+			</column>
+			<column name="PriceCode" type="VARCHAR" length="3" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Hold the price code]]></comment>
+			</column>
+			<column name="Discount" type="FLOAT" jt="7" >
+				<defo>0</defo>
+				<comment><![CDATA[The discount rate]]></comment>
+			</column>
+			<index name="iDealerCode" unique="UNIQUE" >
+				<column name="DealerID" />
+				<column name="PriceCode" />
+			</index>
+		</table>
+		<table name="PurchaseOrderBackOrder" >
+			<column name="BackOrderID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique ID for every pending entry]]></comment>
+			</column>
+			<column name="POItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the specific item in PurchaseOrderItems]]></comment>
+			</column>
+			<column name="QtyPending" type="INT" length="10" jt="4" mandatory="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[The qty pending shipment]]></comment>
+			</column>
+			<column name="Cost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This stores the cost that the dealer will pay for this part]]></comment>
+			</column>
+			<column name="EstShipDate" type="DATE" length="10" jt="91" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;0000-00-00&#039;</defo>
+				<comment><![CDATA[Store the estimated ship date for the back ordered item]]></comment>
+			</column>
+			<column name="Note" type="VARCHAR" length="100" jt="12" >
+				<comment><![CDATA[holds any special note transferred back from vendor]]></comment>
+			</column>
+			<index name="pk_PurchaseOrderBackOrder" unique="PRIMARY_KEY" >
+				<column name="BackOrderID" />
+			</index>
+			<index name="iPOItemID" unique="NORMAL" >
+				<column name="POItemID" />
+			</index>
+			<fk name="Fk_PurchaseOrderBackOrder" virtual="y" to_schema="merx" to_table="PurchaseOrderItems" >
+				<fk_column name="POItemID" pk="POItemID" />
+			</fk>
+		</table>
+		<table name="PurchaseOrderItems" >
+			<column name="POItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each part]]></comment>
+			</column>
+			<column name="POID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[Links the items to a specific purchase order]]></comment>
+			</column>
+			<column name="PartNumber" type="VARCHAR" length="30" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the item's part number]]></comment>
+			</column>
+			<column name="Quantity" type="INT" length="10" jt="4" >
+				<comment><![CDATA[Stores the quantity of parts ordered]]></comment>
+			</column>
+			<column name="OrderType" type="TINYINT" length="3" jt="-6" mandatory="y" regexp_nulls="0" >
+				<defo>2</defo>
+				<comment><![CDATA[1=For Customer, 2=For Stock, 3=Seasonal Order]]></comment>
+			</column>
+			<column name="FillStatus" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[0=ship what you have, 1=only ship if you can fill completely]]></comment>
+			</column>
+			<column name="ItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the Items table]]></comment>
+			</column>
+			<column name="Status" type="TINYINT" length="3" jt="-6" mandatory="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[1=Superseded, 2=Obsolete, 3=Rejected]]></comment>
+			</column>
+			<column name="Supersession" type="VARCHAR" length="30" jt="12" >
+				<comment><![CDATA[holds supersession number if one exists]]></comment>
+			</column>
+			<column name="VendorID" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[The primary VendorID that was submitted on the PO]]></comment>
+			</column>
+			<index name="pk_PurchaseOrderItems" unique="PRIMARY_KEY" >
+				<column name="POItemID" />
+			</index>
+			<index name="iPOID" unique="NORMAL" >
+				<column name="POID" />
+			</index>
+			<index name="iPOIDPartNumber" unique="NORMAL" >
+				<column name="POID" />
+				<column name="PartNumber" />
+			</index>
+			<fk name="Fk_PurchaseOrderItems" virtual="y" to_schema="merx" to_table="PurchaseOrders" >
+				<fk_column name="POID" pk="POID" />
+			</fk>
+			<fk name="Fk_PurchaseOrderItems_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
+				<fk_column name="VendorID" pk="VendorID" />
+			</fk>
+			<fk name="Fk_PurchaseOrderItems_1" virtual="y" to_schema="merx" to_table="Items" >
+				<fk_column name="ItemID" pk="ItemID" />
+			</fk>
+		</table>
+		<table name="PurchaseOrderShipped" >
+			<column name="ShippedID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique ID for every shipping entry.]]></comment>
+			</column>
+			<column name="POItemID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the specific item in PuchaseOrderItems]]></comment>
+			</column>
+			<column name="BoxID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to the specific box in ShippedBoxes]]></comment>
+			</column>
+			<column name="QtyShipped" type="INT" length="10" jt="4" mandatory="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[The qty that were put in the box]]></comment>
+			</column>
+			<column name="Cost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<defo>0.000</defo>
+				<comment><![CDATA[This stores the cost that the dealer will pay for this part]]></comment>
+			</column>
+			<index name="pk_PurchaseOrderShipped" unique="PRIMARY_KEY" >
+				<column name="ShippedID" />
+			</index>
+			<index name="iPOItemID" unique="NORMAL" >
+				<column name="POItemID" />
+			</index>
+			<index name="iBoxID" unique="NORMAL" >
+				<column name="BoxID" />
+			</index>
+			<fk name="Fk_PurchaseOrderShipped" virtual="y" to_schema="merx" to_table="PurchaseOrderItems" >
+				<fk_column name="POItemID" pk="POItemID" />
+			</fk>
+			<fk name="Fk_PurchaseOrderShipped_0" virtual="y" to_schema="merx" to_table="ShippedBoxes" >
+				<fk_column name="BoxID" pk="BoxID" />
+			</fk>
+		</table>
+		<table name="PurchaseOrderUnits" >
+			<column name="POUnitID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" />
+			<column name="POID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to PurchaseOrder table]]></comment>
+			</column>
+			<column name="OrderCode" type="VARCHAR" length="25" jt="12" >
+				<comment><![CDATA[vendor specific part number for this unit]]></comment>
+			</column>
+			<column name="ModelNumber" type="VARCHAR" length="50" jt="12" >
+				<comment><![CDATA[vendor model number]]></comment>
+			</column>
+			<column name="Year" type="INT" length="10" jt="4" unsigned="y" >
+				<defo>0</defo>
+				<comment><![CDATA[year if available]]></comment>
+			</column>
+			<column name="Colors" type="TEXT" length="65535" jt="-1" >
+				<comment><![CDATA[list of colors for unit]]></comment>
+			</column>
+			<column name="Details" type="TEXT" length="65535" jt="-1" >
+				<comment><![CDATA[special notes]]></comment>
+			</column>
+			<column name="Quantity" type="INT" length="10" jt="4" unsigned="y" >
+				<comment><![CDATA[how many of this model is being ordered]]></comment>
+			</column>
+			<column name="ForCustomer" type="TINYINT" length="3" jt="-6" unsigned="y" >
+				<defo>0</defo>
+				<comment><![CDATA[0=for stock, 1=for customer]]></comment>
+			</column>
+			<column name="VendorID" type="VARCHAR" length="5" jt="12" >
+				<comment><![CDATA[holds specific code for vendor]]></comment>
+			</column>
+			<index name="pk_PurchaseOrderUnits" unique="PRIMARY_KEY" >
+				<column name="POUnitID" />
+			</index>
+			<fk name="Fk_PurchaseOrderUnits" virtual="y" to_schema="merx" to_table="PurchaseOrders" >
+				<fk_column name="POID" pk="POID" />
+			</fk>
+			<fk name="Fk_PurchaseOrderUnits_0" virtual="y" to_schema="merx" to_table="VendorCodes" >
+				<fk_column name="VendorID" pk="VendorID" />
+			</fk>
+		</table>
+		<table name="PurchaseOrders" >
+			<column name="POID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each purchase order]]></comment>
+			</column>
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to DealerCredentials table]]></comment>
+			</column>
+			<column name="DealerPONumber" type="VARCHAR" length="20" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the client's purchase order number]]></comment>
+			</column>
+			<column name="VendorInvoiceNumber" type="VARCHAR" length="20" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the vendor's invoice number]]></comment>
+			</column>
+			<column name="DueDate" type="DATE" length="10" jt="91" >
+				<comment><![CDATA[Due Date Returned By Vendor]]></comment>
+			</column>
+			<column name="POReceivedDate" type="DATE" length="10" jt="91" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;0000-00-00&#039;</defo>
+				<comment><![CDATA[Stores the purchase order date received]]></comment>
+			</column>
+			<column name="BillToFirstName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing contact name]]></comment>
+			</column>
+			<column name="BillToLastName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing contact name]]></comment>
+			</column>
+			<column name="BillToCompanyName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing contact name]]></comment>
+			</column>
+			<column name="BillToAddress1" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing address 1]]></comment>
+			</column>
+			<column name="BillToAddress2" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing address 2]]></comment>
+			</column>
+			<column name="BillToCity" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing city]]></comment>
+			</column>
+			<column name="BillToState" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing state/province code]]></comment>
+			</column>
+			<column name="BillToZip" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing postal code]]></comment>
+			</column>
+			<column name="BillToCountry" type="VARCHAR" length="3" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing country code]]></comment>
+			</column>
+			<column name="BillToPhone" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing postal code]]></comment>
+			</column>
+			<column name="BillToEmail" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing postal code]]></comment>
+			</column>
+			<column name="ShipToFirstName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to contact name]]></comment>
+			</column>
+			<column name="ShipToLastName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to contact name]]></comment>
+			</column>
+			<column name="ShipToCompanyName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to contact name]]></comment>
+			</column>
+			<column name="ShipToAddress1" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to address 1]]></comment>
+			</column>
+			<column name="ShipToAddress2" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to address 2]]></comment>
+			</column>
+			<column name="ShipToCity" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to city]]></comment>
+			</column>
+			<column name="ShipToState" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to state/province code]]></comment>
+			</column>
+			<column name="ShipToZip" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to postal code]]></comment>
+			</column>
+			<column name="ShipToCountry" type="VARCHAR" length="3" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to country code]]></comment>
+			</column>
+			<column name="ShipToPhone" type="VARCHAR" length="15" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the ship to country code]]></comment>
+			</column>
+			<column name="ShipToEmail" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the billing postal code]]></comment>
+			</column>
+			<column name="Status" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Holds the PO Status 0 = new, 1 = processing, 2 = pulling, 3 = staging, 4 = shipped, 5 = rejected]]></comment>
+			</column>
+			<column name="PaymentMethod" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[0 = No method specified, 1 = VISA, 2 = Mastercard, 3 = American Express, 4 = Discover, 5 = NET]]></comment>
+			</column>
+			<column name="LastFour" type="CHAR" length="4" jt="1" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Last four of creditcard on file]]></comment>
+			</column>
+			<column name="ShipMethod" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[0 = No method specified, 1 = VISA, 2 = Mastercard, 3 = American Express, 4 = Discover, 5 = NET]]></comment>
+			</column>
+			<column name="Discount" type="DECIMAL" length="9" decimal="2" jt="3" >
+				<defo>0.00</defo>
+				<comment><![CDATA[Holds any discounts sent back from vendor]]></comment>
+			</column>
+			<column name="BSVKeyID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<defo>0</defo>
+				<comment><![CDATA[Links to BSV table]]></comment>
+			</column>
+			<index name="pk_PurchaseOrders" unique="PRIMARY_KEY" >
+				<column name="POID" />
+			</index>
+			<index name="iClientPONumber" unique="NORMAL" >
+				<column name="DealerID" />
+				<column name="DealerPONumber" />
+			</index>
+			<index name="iGetOrders" unique="NORMAL" >
+				<column name="POReceivedDate" />
+				<column name="Status" />
+			</index>
+			<index name="iGetOrders2" unique="NORMAL" >
+				<column name="Status" />
+			</index>
+			<fk name="Fk_PurchaseOrders" virtual="y" to_schema="merx" to_table="AuthorizedBSVKeys" >
+				<fk_column name="BSVKeyID" pk="BSVKeyID" />
+			</fk>
+			<fk name="Fk_PurchaseOrders_0" virtual="y" to_schema="merx" to_table="DealerCredentials" >
+				<fk_column name="DealerID" pk="DealerID" />
+			</fk>
+		</table>
+		<table name="ShippedBoxes" >
+			<column name="BoxID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique ID for each box shipped]]></comment>
+			</column>
+			<column name="BoxNumber" type="VARCHAR" length="25" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;1&#039;</defo>
+				<comment><![CDATA[Stores the box number assigned by the vendor]]></comment>
+			</column>
+			<column name="TrackingNumber" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the boxes tracking number]]></comment>
+			</column>
+			<column name="VendorInvoiceNumber" type="VARCHAR" length="20" jt="12" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the vendor's invoice number]]></comment>
+			</column>
+			<column name="DueDate" type="DATE" length="10" jt="91" >
+				<comment><![CDATA[Due Date Returned By Vendor]]></comment>
+			</column>
+			<index name="pk_ShippedBoxes" unique="PRIMARY_KEY" >
+				<column name="BoxID" />
+			</index>
+			<index name="iTracking" unique="NORMAL" >
+				<column name="TrackingNumber" />
+			</index>
+		</table>
+		<table name="UnitModel" >
+			<column name="ModelID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" />
+			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to Vendor Table]]></comment>
+			</column>
+			<column name="OrderCode" type="VARCHAR" length="25" jt="12" >
+				<comment><![CDATA[vendor specific part number for this unit]]></comment>
+			</column>
+			<column name="ModelNumber" type="VARCHAR" length="50" jt="12" >
+				<comment><![CDATA[vendor model number]]></comment>
+			</column>
+			<column name="ModelNumberNoFormat" type="VARCHAR" length="50" jt="12" >
+				<comment><![CDATA[vendor model number stripped of all formatting]]></comment>
+			</column>
+			<column name="VehicleType" type="VARCHAR" length="50" jt="12" >
+				<comment><![CDATA[Street, Dirt, Atv, Car, Truck...]]></comment>
+			</column>
+			<column name="Year" type="INT" length="10" jt="4" unsigned="y" >
+				<defo>0</defo>
+				<comment><![CDATA[year if available]]></comment>
+			</column>
+			<column name="Colors" type="TEXT" length="65535" jt="-1" >
+				<comment><![CDATA[list of colors for unit]]></comment>
+			</column>
+			<column name="Details" type="TEXT" length="65535" jt="-1" >
+				<comment><![CDATA[special notes]]></comment>
+			</column>
+			<index name="pk_UnitModel" unique="PRIMARY_KEY" >
+				<column name="ModelID" />
+			</index>
+			<fk name="Fk_UnitModel" virtual="y" to_schema="merx" to_table="VendorCodes" >
+				<fk_column name="VendorID" pk="VendorID" />
+			</fk>
+		</table>
+		<table name="UnitModelImages" >
+			<column name="ImageID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" />
+			<column name="ModelID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to Model Table]]></comment>
+			</column>
+			<column name="ImageURL" type="VARCHAR" length="100" jt="12" >
+				<comment><![CDATA[URL to image of unit]]></comment>
+			</column>
+			<index name="pk_UnitModelImages" unique="PRIMARY_KEY" >
+				<column name="ImageID" />
+			</index>
+			<fk name="Fk_UnitModelImages" virtual="y" to_schema="merx" to_table="UnitModel" >
+				<fk_column name="ModelID" pk="ModelID" />
+			</fk>
+		</table>
+		<table name="VendorCodes" >
+			<column name="VendorID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Unique key for each VendorCode]]></comment>
+			</column>
+			<column name="VendorCode" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[Standard VendorCode]]></comment>
+			</column>
+			<index name="pk_VendorCodes" unique="PRIMARY_KEY" >
+				<column name="VendorID" />
+			</index>
+			<index name="iVendorCode" unique="UNIQUE" >
+				<column name="VendorCode" />
+			</index>
+		</table>
+		<table name="VendorCredentials" >
+			<column name="VendorKey" type="CHAR" length="64" jt="1" mandatory="y" regexp_nulls="0" >
+				<defo>&#039;&#039;</defo>
+				<comment><![CDATA[Stores the Vendors auth key]]></comment>
+			</column>
+			<column name="IPAddress" type="INT" length="10" jt="4" unsigned="y" >
+				<comment><![CDATA[Holds the vendors ip address]]></comment>
+			</column>
+		</table>
+		<table name="Warehouses" >
+			<column name="WarehouseID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
+				<comment><![CDATA[Warehouse ID for supported warehouses]]></comment>
+			</column>
+			<column name="WarehouseName" type="VARCHAR" length="50" jt="12" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[name of different warehouses]]></comment>
+			</column>
+			<column name="WarehouseState" type="VARCHAR" length="5" jt="12" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[state the warehouse resides in]]></comment>
+			</column>
+			<index name="pk_Warehouses" unique="PRIMARY_KEY" >
+				<column name="WarehouseID" />
+			</index>
+			<index name="WarehouseName" unique="NORMAL" >
+				<column name="WarehouseName" />
+			</index>
+		</table>
+	</schema>
+	<connector name="MySql" database="MySql" driver_class="com.mysql.jdbc.Driver" driver_jar="mysql-connector-java-5.1.20-bin.jar" host="localhost" port="3306" instance="merx" user="root" passwd="ZWF0MTRtZQ==" schema_mapping="" />
+	<layout id="Layout953281" name="merx" show_relation_columns="y" >
+		<entity schema="merx" name="PriceCodesLink" color="aac6f2" x="60" y="705" />
+		<entity schema="merx" name="AuthorizedBSVKeys" color="aac6f2" x="45" y="75" />
+		<entity schema="merx" name="DealerCredentials" color="aac6f2" x="45" y="195" />
+		<entity schema="merx" name="PurchaseOrderShipped" color="aac6f2" x="945" y="330" />
+		<entity schema="merx" name="BSVVendorCodeLinks" color="aac6f2" x="90" y="480" />
+		<entity schema="merx" name="PurchaseOrderBackOrder" color="aac6f2" x="945" y="480" />
+		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="960" y="60" />
+		<entity schema="merx" name="ShippedBoxes" color="aac6f2" x="675" y="345" />
+		<entity schema="merx" name="VendorCodes" color="aac6f2" x="255" y="390" />
+		<entity schema="merx" name="PurchaseOrderItems" color="aac6f2" x="720" y="75" />
+		<entity schema="merx" name="ItemCost" color="aac6f2" x="555" y="705" />
+		<entity schema="merx" name="DealerDiscountLink" color="aac6f2" x="375" y="705" />
+		<entity schema="merx" name="Warehouses" color="aac6f2" x="465" y="945" />
+		<entity schema="merx" name="ItemStock" color="aac6f2" x="210" y="705" />
+		<entity schema="merx" name="VendorCredentials" color="aac6f2" x="105" y="390" />
+		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="465" y="60" />
+		<entity schema="merx" name="Items" color="aac6f2" x="105" y="870" />
+		<entity schema="merx" name="ItemImages" color="aac6f2" x="420" y="825" />
+		<entity schema="merx" name="UnitModelImages" color="aac6f2" x="990" y="720" />
+		<entity schema="merx" name="UnitModel" color="aac6f2" x="765" y="720" />
+		<group name="Security" color="c4e0f9" >
+			<entity schema="merx" name="VendorCredentials" />
+			<entity schema="merx" name="AuthorizedBSVKeys" />
+			<entity schema="merx" name="BSVVendorCodeLinks" />
+			<entity schema="merx" name="VendorCodes" />
+			<entity schema="merx" name="DealerCredentials" />
+		</group>
+		<group name="Purchase Orders" color="66ff66" >
+			<entity schema="merx" name="PurchaseOrders" />
+			<entity schema="merx" name="PurchaseOrderShipped" />
+			<entity schema="merx" name="PurchaseOrderBackOrder" />
+			<entity schema="merx" name="PurchaseOrderUnits" />
+			<entity schema="merx" name="ShippedBoxes" />
+			<entity schema="merx" name="PurchaseOrderItems" />
+		</group>
+		<group name="Group_" color="c4e0f9" >
+			<entity schema="merx" name="Items" />
+			<entity schema="merx" name="PriceCodesLink" />
+			<entity schema="merx" name="ItemCost" />
+			<entity schema="merx" name="DealerDiscountLink" />
+			<entity schema="merx" name="Warehouses" />
+			<entity schema="merx" name="ItemStock" />
+		</group>
+	</layout>
+</project>

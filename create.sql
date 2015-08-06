@@ -198,7 +198,7 @@ CREATE TABLE `PurchaseOrderItems` (
   `OrderType` tinyint(3) NOT NULL DEFAULT 2 COMMENT '1=For Customer, 2=For Stock, 3=Seasonal Order',
   `FillStatus` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0=ship what you have, 1=only ship if you can fill completely',
   `ItemID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Items table',
-  `VendorCode` varchar(5) NOT NULL DEFAULT '' COMMENT 'The original VendorCode that was submitted on the PO',
+  `VendorID` varchar(5) NOT NULL DEFAULT '' COMMENT 'The primary VendorID that was submitted on the PO',
   `Status` tinyint(3) NOT NULL DEFAULT 0 COMMENT '1=Superseded, 2=Obsolete, 3=Rejected',
   `Supersession` varchar(30) comment 'holds supersession number if one exists',
   PRIMARY KEY (`POItemID`),
@@ -233,7 +233,7 @@ CREATE TABLE `PurchaseOrderShipped` (
 drop table if exists `PurchaseOrderUnits`;
 create table PurchaseOrderUnits( POUnitID int unsigned not null auto_increment primary key, 
 POID int unsigned not null comment 'links to PurchaseOrder table',
-VendorCode varchar(5) comment 'holds specific code for vendor', 
+VendorID varchar(5) comment 'holds specific code for vendor', 
 OrderCode varchar(25) comment 'vendor specific part number for this unit', 
 ModelNumber varchar(50) comment 'vendor model number', 
 Year int unsigned default 0 comment 'year if available', 
@@ -255,6 +255,7 @@ DROP TABLE IF EXISTS `PurchaseOrders`;
 CREATE TABLE `PurchaseOrders` (
   `POID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each purchase order',
   `DealerID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to DealerCredentials table',
+  `BSVKeyID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to BSV table',
   `DealerPONumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the client''s purchase order number',
   `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
@@ -336,12 +337,34 @@ DROP TABLE IF EXISTS `VendorCredentials`;
 CREATE TABLE `VendorCredentials` (
   `VendorKey` char(64) NOT NULL DEFAULT '' COMMENT 'Stores the Vendors auth key',
   `IPAddress` int(10) unsigned DEFAULT NULL COMMENT 'Holds the vendors ip address'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Stores the authorized vendor key';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used for controlling access to Admin methods';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 
+drop table if exists `UnitModel`;
+create table UnitModel( ModelID int unsigned not null auto_increment primary key, 
+VendorID int unsigned not null comment 'links to Vendor Table',
+OrderCode varchar(25) comment 'vendor specific part number for this unit', 
+ModelNumber varchar(50) comment 'vendor model number', 
+ModelNumberNoFormat varchar(50) comment 'vendor model number stripped of all formatting', 
+VehicleType varchar(50) comment 'Street, Dirt, Atv, Car, Truck...', 
+Year int unsigned default 0 comment 'year if available', 
+Colors text comment 'list of colors for unit', 
+Details text comment 'special notes') 
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model information';
 
+drop table if exists `UnitModelImages`;
+create table UnitModelImages( ImageID int unsigned not null auto_increment primary key, 
+ModelID int unsigned not null comment 'links to Model Table',
+ImageURL varchar(100) comment 'URL to image of unit') 
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model image urls';
+
+drop table if exists `ItemImages`;
+create table ItemImages( ImageID int unsigned not null auto_increment primary key, 
+ItemID int unsigned not null comment 'links to Model Table',
+ImageURL varchar(100) comment 'URL to image of unit') 
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model image urls';
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
