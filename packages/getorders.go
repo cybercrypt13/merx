@@ -133,7 +133,7 @@ func GetOrder(db *sql.DB, date string, allorders string) (code int, resp []byte,
 		}
 
 		//10.03.2013 naj - now we need to get all the parts on this po and added it to the po structure.
-		rows2, err := db.Query("select VendorCode, PartNumber, Quantity from PurchaseOrderItems where POID = ?", poid)
+		rows2, err := db.Query("select VendorID, PartNumber, Quantity from PurchaseOrderItems where POID = ?", poid)
 
 		if err != nil {
 			code = http.StatusInternalServerError
@@ -149,7 +149,7 @@ func GetOrder(db *sql.DB, date string, allorders string) (code int, resp []byte,
 		for rows2.Next() {
 			var i item
 
-			err = rows2.Scan(&i.VendorCode, &i.PartNumber, &i.Qty)
+			err = rows2.Scan(&i.VendorID, &i.PartNumber, &i.Qty)
 
 			if err != nil {
 				code = http.StatusInternalServerError

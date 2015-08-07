@@ -132,7 +132,7 @@ func (p *POUpdates) ProcessPackage() (code int, err error) {
 				c := b.Items[z]
 
 				//09.30.2013 naj - get the POItemID
-				rows, err := db.Query("select POItemID, Quantity from PurchaseOrderItems where POID = ? and VendorCode = ? and PartNumber = ?", poid, c.VendorCode, c.PartNumber)
+				rows, err := db.Query("select POItemID, Quantity from PurchaseOrderItems where POID = ? and VendorID = ? and PartNumber = ?", poid, c.VendorID, c.PartNumber)
 
 				if err != nil {
 					code = http.StatusInternalServerError
@@ -203,7 +203,7 @@ func (p *POUpdates) ProcessPackage() (code int, err error) {
 			b := a.Pending[y]
 
 			//09.30.2013 naj - get the POItemID
-			rows, err := db.Query("select POItemID from PurchaseOrderItems where POID = ? and VendorCode = ? and PartNumber = ?", poid, b.VendorCode, b.PartNumber)
+			rows, err := db.Query("select POItemID from PurchaseOrderItems where POID = ? and VendorID = ? and PartNumber = ?", poid, b.VendorID, b.PartNumber)
 
 			if err != nil {
 				code = http.StatusInternalServerError

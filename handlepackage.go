@@ -35,7 +35,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-
+	"strconv"
 	_ "github.com/go-sql-driver/mysql"
 	"merx/common"
 	"merx/packages"
@@ -69,11 +69,15 @@ func handlePackage(	req *http.Request,
 			}
 		}
 
+		//convert vendorid to int
+
 		//07.12.2013 ghh - check inventory
 		if strings.ToLower(url) == "inventoryverify" {
+			vendorid, _ := strconv.ParseInt(urlquery.Get( "VendorID" ),10,0)
+
 			code, json, err = packages.GetInventoryLocal(dealerid, 
 							bsvkeyid, 
-							urlquery.Get("VendorCode"), 
+							int(vendorid), 
 							urlquery.Get("PartNumber"), 
 							db)
 			if err != nil {

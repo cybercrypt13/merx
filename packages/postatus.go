@@ -100,7 +100,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 	//}
 
 	//06.03.2013 naj - now get all parts and the associated boxes
-	rows, err := db.Query("select ifnull(a.VendorCode, ''), ifnull(a.PartNumber, ''), ifnull(b.BoxID, 0), "+
+	rows, err := db.Query("select ifnull(a.VendorID, ''), ifnull(a.PartNumber, ''), ifnull(b.BoxID, 0), "+
 		"ifnull(b.QtyShipped, 0), ifnull(c.QtyPending, 0), ifnull(c.EstShipDate, ''), b.Cost "+
 		"from PurchaseOrderItems a left outer join PurchaseOrderShipped b on a.POItemID = b.POItemID "+
 		"left outer join PurchaseOrderBackOrder c on a.POItemID = c.POItemID where "+
@@ -121,11 +121,11 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 
 	//07.10.2013 naj - Loop through the results
 	for rows.Next() {
-		var vendorcode, partnumber, estship string
-		var boxid, qtyshipped, qtypending int
+		var partnumber, estship string
+		var vendorid, boxid, qtyshipped, qtypending int
 		var cost float32
 
-		err = rows.Scan(&vendorcode, &partnumber, &boxid, &qtyshipped, &qtypending, &estship, &cost)
+		err = rows.Scan(&vendorid, &partnumber, &boxid, &qtyshipped, &qtypending, &estship, &cost)
 
 		if err != nil {
 			code = http.StatusInternalServerError
@@ -149,7 +149,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 			//06.03.2013 naj - add the current parts data to the items slice
 			if qtyshipped > 0 {
 				items = items[0 : len(items)+1]
-				items[x].VendorCode = vendorcode
+				items[x].VendorID = vendorid
 				items[x].PartNumber = partnumber
 				items[x].Qty = qtyshipped
 				items[x].Cost = cost
@@ -165,7 +165,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 				}
 
 				pend = pend[0 : len(pend)+1]
-				pend[z].VendorCode = vendorcode
+				pend[z].VendorID = vendorid
 				pend[z].PartNumber = partnumber
 				pend[z].Qty = qtypending
 				pend[z].EstShipDate = estship
@@ -213,7 +213,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 			//06.03.2013 naj - add the current parts data to the items slice
 			if qtyshipped > 0 {
 				items = items[0 : len(items)+1]
-				items[x].VendorCode = vendorcode
+				items[x].VendorID = vendorid
 				items[x].PartNumber = partnumber
 				items[x].Qty = qtyshipped
 				items[x].Cost = cost
@@ -229,7 +229,7 @@ func GetOrderStatus(dealerid int, internalid string, db *sql.DB) (code int, resp
 				}
 
 				pend = pend[0 : len(pend)+1]
-				pend[z].VendorCode = vendorcode
+				pend[z].VendorID = vendorid
 				pend[z].PartNumber = partnumber
 				pend[z].Qty = qtypending
 				pend[z].EstShipDate = estship

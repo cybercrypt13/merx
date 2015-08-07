@@ -43,6 +43,7 @@ type POSend struct {
 type PO struct {
 	POID 	         		string //only used when the vendor retrieves a PO
 	DealerID					int
+	BSVKeyID					int
 	Status					int
 	AccountNumber   		string //only used when the vendor retrieves a PO
 	PODate          		string //only used when the vendor retrieves a PO
@@ -78,13 +79,13 @@ type PO struct {
 }
 
 type item struct {
-	VendorID string
-	PartNumber string
-	Qty        int
+	VendorID 	int
+	PartNumber 	string
+	Qty        	int
 }
 
 type unit struct {
-	VendorID 	string
+	VendorID 	int
 	OrderCode 	string
 	ModelNumber string
 	Year			int
@@ -102,18 +103,18 @@ type AcceptedOrder struct {
 }
 
 type ItemNote struct {
-	VendorID string
-	PartNumber string
-	Superceded int
-	NLA        int
-	Note       string
+	VendorID 	int
+	PartNumber 	string
+	Superceded 	int
+	NLA        	int
+	Note       	string
 }
 
 type Parts struct {
-	ItemID     int
-	VendorID string
-	PartNumber string
-	Qty        int
+	ItemID     	int
+	VendorID 	int
+	PartNumber 	string
+	Qty        	int
 }
 
 //05.29.2013 naj - main structure for adding dealers
@@ -138,7 +139,7 @@ type Dealers struct {
 }
 
 type inventory struct {
-	VendorID  string
+	VendorID  	int
 	PartNumber  string
 	Description string
 	MSRP        float32
@@ -169,14 +170,14 @@ type box struct {
 }
 
 type shipitem struct {
-	VendorID string
-	PartNumber string
-	Qty        int
-	Cost       float32
+	VendorID 	int
+	PartNumber 	string
+	Qty        	int
+	Cost       	float32
 }
 
 type penditem struct {
-	VendorID  string
+	VendorID  	int
 	PartNumber  string
 	Qty         int
 	Cost        float32
@@ -213,28 +214,28 @@ type optiondetails struct {
 }
 
 type VehicleData struct {
-	VendorID          string
-	ModelNumber         string
-	ModelYear           string
-	ModelDescription    string
-	VehicleNotes        string
-	PrimaryColor        string
-	SecondaryColor      string
-	VehicleType         string
-	VehicleTypeCategory string
-	Drivetrain          string
-	SeatingCapacity     int
-	MaxOccupantWeight   measurements
-	TransmissionType    string
-	VIN                 string
-	Weight              measurements
-	WheelBase           measurements
-	SeatHeight          measurements
-	WarrantyEndDate     string
-	WarrantyEndDistance measurements
-	WarrantyTerms       string
-	SaleDate            string
-	Engine              []enginedetails
-	Options             []optiondetails
-	PropellerType       string
+	VendorID          	int
+	ModelNumber         	string
+	ModelYear           	string
+	ModelDescription    	string
+	VehicleNotes        	string
+	PrimaryColor        	string
+	SecondaryColor      	string
+	VehicleType         	string
+	VehicleTypeCategory 	string
+	Drivetrain          	string
+	SeatingCapacity     	int
+	MaxOccupantWeight   	measurements
+	TransmissionType    	string
+	VIN                 	string
+	Weight              	measurements
+	WheelBase           	measurements
+	SeatHeight          	measurements
+	WarrantyEndDate     	string
+	WarrantyEndDistance 	measurements
+	WarrantyTerms       	string
+	SaleDate            	string
+	Engine              	[]enginedetails
+	Options             	[]optiondetails
+	PropellerType       	string
 }

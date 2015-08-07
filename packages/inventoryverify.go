@@ -39,7 +39,7 @@ import (
 	"merx/common"
 )
 
-func GetInventoryLocal(dealerid int, bsvkeyid int, vendorcode string, partnum string, db *sql.DB) (code int, resp []byte, err error) {
+func GetInventoryLocal(dealerid int, bsvkeyid int, vendorid int, partnum string, db *sql.DB) (code int, resp []byte, err error) {
 	//06.05.2013 naj - make sure we have a merxpo
 	if partnum == "" {
 		code = http.StatusBadRequest
@@ -47,15 +47,6 @@ func GetInventoryLocal(dealerid int, bsvkeyid int, vendorcode string, partnum st
 		return
 	}
 
-	vendorid, err := common.GetVendorID(db, bsvkeyid, vendorcode)
-	if err != nil {
-		if err.Error() == "Unable to locate Vendor" {
-			code = http.StatusNotFound
-		} else {
-			code = http.StatusInternalServerError
-		}
-		return
-	}
 
 	itemid, superseded, nla, err := common.GetPart(db, vendorid, partnum)
 	if err != nil {
@@ -70,9 +61,12 @@ func GetInventoryLocal(dealerid int, bsvkeyid int, vendorcode string, partnum st
 	//07.12.2013 naj - setup response object
 	var r inventory
 	r.PartNumber = partnum
-	r.VendorCode = vendorcode
+	r.VendorID = vendorid
 
-	err = db.QueryRow("select Description, Cost, List, QtyAvail, Category from Items where ItemID = ?", itemid).Scan(&r.Description, &r.Cost, &r.MSRP, &r.Stock, &r.Category)
+	err = db.QueryRow(`select Description, Cost, List, QtyAvail, Category 
+							from Items 
+							where ItemID = ?`, itemid).Scan(&r.Description, 
+							&r.Cost, &r.MSRP, &r.Stock, &r.Category)
 
 	switch {
 	case err == sql.ErrNoRows:
