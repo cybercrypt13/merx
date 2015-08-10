@@ -85,7 +85,7 @@ CREATE TABLE `Items` (
   `Description` varchar(75) NOT NULL DEFAULT '' COMMENT 'The part description',
   `ManufPartNumber` varchar(25) comment 'original manufacturer part number',
   `ManufName` varchar(50) comment 'original manufacturer name',
-  `SupersessionNumber` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the ItemID of the superseeding part',
+  `SupersessionID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the ItemID of the superseeding part',
   `NLA` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'No longer available flag, 0 = false, 1 = true',
   `CloseOut` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Will not be available after inventory depleted 0 = false, 1 = true',
   `PriceCode` varchar(3) NOT NULL DEFAULT '' COMMENT 'Holds the price code that applies to this part',
@@ -98,8 +98,16 @@ CREATE TABLE `Items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the manufacturer/suppliers price file';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `ItemCrossReference`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ItemCrossReference` (
+  `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
+  `CrossReferenceID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the VendorCode table',
+  PRIMARY KEY (`ItemID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds any cross reference data about the part';
 --
--- Table structure for table `ItemStock`
+-- Table structure for table `ItemCrossReference`
 --
 
 DROP TABLE IF EXISTS `ItemStock`;
@@ -186,7 +194,7 @@ CREATE TABLE `PurchaseOrderItems` (
   `ItemID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Items table',
   `VendorID` varchar(5) NOT NULL DEFAULT '' COMMENT 'The primary VendorID that was submitted on the PO',
   `Status` tinyint(3) NOT NULL DEFAULT 0 COMMENT '1=Superseded, 2=Obsolete, 3=Rejected',
-  `Supersession` varchar(30) comment 'holds supersession number if one exists',
+  `SupersessionID` varchar(30) comment 'holds supersession number if one exists',
   PRIMARY KEY (`POItemID`),
   KEY `iPOID` (`POID`),
   KEY `iPOIDPartNumber` (`POID`,`PartNumber`)
@@ -277,6 +285,7 @@ DROP TABLE IF EXISTS `ShippedBoxes`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ShippedBoxes` (
   `BoxID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for each box shipped',
+  `WarehouseID` int(10) unsigned NOT NULL COMMENT 'links to warehouse table to show where packages shipped from',
   `BoxNumber` varchar(25) NOT NULL DEFAULT '1' COMMENT 'Stores the box number assigned by the vendor',
   `TrackingNumber` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the boxes tracking number',
   `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
