@@ -130,6 +130,18 @@ CREATE TABLE `ItemCost` (
   PRIMARY KEY (`ItemID`, `DealerID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds cost per dealer per item';
 
+
+DROP TABLE IF EXISTS `DaysToFullfill`;
+
+CREATE TABLE `DaysToFullfill` (
+  `DealerID` int(10) unsigned NOT NULL COMMENT 'Links to dealer table',
+  `WarehouseID` int(10) unsigned NOT NULL COMMENT 'Links to warehouse table',
+  `DaysToArrive` int(10) NOT NULL COMMENT 'how many days before shipment arrives from this warehouse',
+  PRIMARY KEY (`DealerID`, `WarehouseID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds number of days to arrive from each warehouse for each dealer';
+
+
+
 --
 -- Table structure for table `Warehouses`
 --

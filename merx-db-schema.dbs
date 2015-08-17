@@ -17,6 +17,27 @@
 				<column name="BSVKeyID" />
 			</index>
 		</table>
+		<table name="DaysToFullfill" >
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[Links to dealer table]]></comment>
+			</column>
+			<column name="WarehouseID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[Links to warehouse table]]></comment>
+			</column>
+			<column name="DaysToArrive" type="INT" length="10" jt="4" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[how many days before shipment arrives from this warehouse]]></comment>
+			</column>
+			<index name="pk_DaysToFullfill" unique="PRIMARY_KEY" >
+				<column name="DealerID" />
+				<column name="WarehouseID" />
+			</index>
+			<fk name="Fk_DaysToFullfill" virtual="y" to_schema="merx" to_table="DealerCredentials" >
+				<fk_column name="DealerID" pk="DealerID" />
+			</fk>
+			<fk name="Fk_DaysToFullfill_0" virtual="y" to_schema="merx" to_table="Warehouses" >
+				<fk_column name="WarehouseID" pk="WarehouseID" />
+			</fk>
+		</table>
 		<table name="DealerCredentials" >
 			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" >
 				<comment><![CDATA[Unique key for each dealer]]></comment>
@@ -656,6 +677,7 @@
 		<entity schema="merx" name="PurchaseOrderItems" color="aac6f2" x="720" y="75" />
 		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="465" y="60" />
 		<entity schema="merx" name="ItemCrossReference" color="aac6f2" x="315" y="960" />
+		<entity schema="merx" name="DaysToFullfill" color="aac6f2" x="270" y="255" />
 		<group name="Security" color="c4e0f9" >
 			<entity schema="merx" name="VendorCredentials" />
 			<entity schema="merx" name="AuthorizedBSVKeys" />
@@ -669,7 +691,7 @@
 			<entity schema="merx" name="ShippedBoxes" />
 			<entity schema="merx" name="PurchaseOrderItems" />
 		</group>
-		<group name="Group_" color="c4e0f9" >
+		<group name="Items" color="c4e0f9" >
 			<entity schema="merx" name="Items" />
 			<entity schema="merx" name="PriceCodesLink" />
 			<entity schema="merx" name="ItemCost" />
