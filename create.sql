@@ -381,14 +381,35 @@ insert into Warehouses values( null, 'Tennessee', 'TN' );
 
 insert into Items values( null, 1, '53-04855', 'Rear Wheel Slide Rail Ext', 'MM-E8-55', 'MM',0,1,0,0,'83.38','159.95',0,'Street');
 insert into ItemCost values( 1, 1, 83.38 );
+insert into ItemStock values( 1, 1, 3 );
+insert into ItemStock values( 1, 2, 5 );
+insert into ItemStock values( 1, 3, 7 );
+insert into ItemStock values( 1, 4, 2 );
 
 insert into Items values( null, 1, '550-0138', 'HiFloFiltro Oil Filter', 'HF138', 'HiFlo',0,0,0,0,'4.49','7.95',0,'Street');
+insert into ItemStock values( 2, 1, 1 );
+insert into ItemStock values( 2, 2, 3 );
+insert into ItemStock values( 2, 3, 6 );
+insert into ItemStock values( 2, 4, 8 );
 
 insert into Items values( null, 1, '730003', 'K&N Air Filter', 'HA-0003', 'K&N',0,0,0,0,'64.99','98.68',0,'Street');
 insert into ItemCost values( 3, 1, 51.99 );
+insert into ItemStock values( 3, 1, 3 );
+insert into ItemStock values( 3, 2, 5 );
+insert into ItemStock values( 3, 3, 22 );
+insert into ItemStock values( 3, 4, 13 );
 
 insert into Items values( null, 1, '2-B10HS', 'NGK Spark Plug #2399/10', '2399', 'NGK',0,0,0,0,'1.79','2.95',0,'Street');
 insert into ItemCost values( 4, 1, 1.61 );
+insert into ItemStock values( 4, 1, 33 );
+insert into ItemStock values( 4, 2, 55 );
+insert into ItemStock values( 4, 3, 2 );
+insert into ItemStock values( 4, 4, 1 );
 
 insert into Items values( null, 1, '87-9937', 'Michelin Tire 120/70 ZR18 Pilot RD4 GT', '49243', 'Michelin',0,0,1,0,'174.99','250.95',0,'Street');
 insert into ItemCost values( 5, 1, 127.74 );
+insert into ItemStock values( 5, 1, 3 );
+insert into ItemStock values( 5, 2, 55 );
+insert into ItemStock values( 5, 3, 24 );
+insert into ItemStock values( 5, 4, 10 );
+
