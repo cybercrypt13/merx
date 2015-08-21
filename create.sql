@@ -81,9 +81,9 @@ DROP TABLE IF EXISTS `Items`;
 CREATE TABLE `Items` (
   `ItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part in merX',
   `VendorID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the VendorCode table',
-  `PartNumber` varchar(30) NOT NULL DEFAULT '' COMMENT 'The part number',
+  `ItemNumber` varchar(30) NOT NULL DEFAULT '' COMMENT 'The part number',
   `Description` varchar(75) NOT NULL DEFAULT '' COMMENT 'The part description',
-  `ManufPartNumber` varchar(25) comment 'original manufacturer part number',
+  `ManufItemNumber` varchar(25) comment 'original manufacturer part number',
   `ManufName` varchar(50) comment 'original manufacturer name',
   `SupersessionID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the ItemID of the superseeding part',
   `NLA` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'No longer available flag, 0 = false, 1 = true',
@@ -94,7 +94,7 @@ CREATE TABLE `Items` (
   `MAP` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the minimum advertise price of the item',
   `Category` varchar(50) NOT NULL DEFAULT '' COMMENT 'Hold category info',
   PRIMARY KEY (`ItemID`),
-  KEY `iPart` (`VendorID`,`PartNumber`)
+  KEY `iPart` (`VendorID`,`ItemNumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the manufacturer/suppliers price file';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -199,7 +199,7 @@ DROP TABLE IF EXISTS `PurchaseOrderItems`;
 CREATE TABLE `PurchaseOrderItems` (
   `POItemID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each part',
   `POID` int(10) unsigned NOT NULL COMMENT 'Links the items to a specific purchase order',
-  `PartNumber` varchar(30) NOT NULL DEFAULT '' COMMENT 'Stores the item''s part number',
+  `ItemNumber` varchar(30) NOT NULL DEFAULT '' COMMENT 'Stores the item''s part number',
   `Quantity` int(11) DEFAULT NULL COMMENT 'Stores the quantity of parts ordered',
   `OrderType` tinyint(3) NOT NULL DEFAULT 2 COMMENT '1=For Customer, 2=For Stock, 3=Seasonal Order',
   `FillStatus` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0=ship what you have, 1=only ship if you can fill completely',
@@ -209,7 +209,7 @@ CREATE TABLE `PurchaseOrderItems` (
   `SupersessionID` varchar(30) comment 'holds supersession number if one exists',
   PRIMARY KEY (`POItemID`),
   KEY `iPOID` (`POID`),
-  KEY `iPOIDPartNumber` (`POID`,`PartNumber`)
+  KEY `iPOIDPartNumber` (`POID`,`ItemNumber`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='This table stores the client''s purchase order data.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -260,14 +260,14 @@ DROP TABLE IF EXISTS `PurchaseOrders`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PurchaseOrders` (
   `POID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique key for each purchase order',
+  `Status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Holds the PO Status 0 = pending, 1 = ordered, 2 = processing, 3 = pulling, 4 = staging, 5 = shipping, 6 = completed',
   `DealerID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to DealerCredentials table',
   `BSVKeyID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to BSV table',
-  `DealerPONumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the client''s purchase order number',
+  `PONumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the client''s purchase order number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
-  `POReceivedDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Stores the purchase order date received',
   `ShipToFirstName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
   `ShipToLastName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
-  `ShipToCompanyName` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to contact name',
+  `ShipToCompany` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to company name',
   `ShipToAddress1` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to address 1',
   `ShipToAddress2` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to address 2',
   `ShipToCity` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the ship to city',
@@ -276,14 +276,19 @@ CREATE TABLE `PurchaseOrders` (
   `ShipToCountry` varchar(3) NOT NULL DEFAULT '' COMMENT 'Stores the ship to country code',
   `ShipToPhone` varchar(15) NOT NULL DEFAULT '' COMMENT 'Stores the ship to country code',
   `ShipToEmail` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the billing postal code',
-  `Status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Holds the PO Status 0 = new, 1 = processing, 2 = pulling, 3 = staging, 4 = shipped, 5 = rejected',
   `PaymentMethod` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0 = No method specified, 1 = VISA, 2 = Mastercard, 3 = American Express, 4 = Discover, 5 = NET',
   `LastFour` char(4) NOT NULL DEFAULT '' COMMENT 'Last four of creditcard on file',
   `ShipMethod` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0 = No method specified, 1 = VISA, 2 = Mastercard, 3 = American Express, 4 = Discover, 5 = NET',
   `Discount` decimal(9,2) default 0 comment 'Holds any discounts sent back from vendor',
+  `DateCreated` datetime  COMMENT 'Stores the initial purchase order date received',
+  `DateOrdered` datetime  COMMENT 'Stores the date the dealer physically placed the order',
+  `DateLastModified` datetime  COMMENT 'Stores the date the order was last touched',
+  `DateProcessed` datetime  COMMENT 'Stores the date the order was pulled into supplier backend system',
+  `DateFirstShipped` datetime  COMMENT 'Stores the date the first part was shipped out for the order',
+  `DateFinalShipped` datetime  COMMENT 'Stores the date the last part was shipped out for the order',
   PRIMARY KEY (`POID`),
-  KEY `iClientPONumber` (`DealerID`,`DealerPONumber`),
-  KEY `iGetOrders` (`POReceivedDate`,`Status`),
+  KEY `iClientPONumber` (`DealerID`,`PONumber`),
+  KEY `iGetOrders` (`DateOrdered`,`Status`),
   KEY `iGetOrders2` (`Status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='This table stores the client''s purchase order data.';
 /*!40101 SET character_set_client = @saved_cs_client */;

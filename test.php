@@ -1,33 +1,27 @@
 <?php
 $parts = array(
 	array(
-		"VendorID"	=> "PRTUN",
-		"PartNumber"	=> "123456",
+		"VendorID"	=> "1",
+		"PartNumber"	=> "53-04855",
 		"Qty"				=> 1
 	),
 	array(
-		"VendorID"	=> "PRTUN",
-		"PartNumber"	=> "12357",
+		"VendorID"	=> "1",
+		"PartNumber"	=> "550-0138",
 		"Qty"				=> 2
 	),
 	array(
-		"VendorID"	=> "PRTUN",
-		"PartNumber"	=> "12358",
+		"VendorID"	=> "1",
+		"PartNumber"	=> "2-B10HS",
 		"Qty"				=> 3
 	)
 );
 
 $po = array(
-	"DealerPONumber"	=> "PO-1234",
-	"PODate"				=> "2013-05-29",
-	"BillToName"		=> "Nizex Inc.",
-	"BillToAddress1"	=> "1735 Pennsylvania Ave.",
-	"BillToAddress2"	=> "None",
-	"BillToCity"		=> "McDonough",
-	"BillToState"		=> "GA",
-	"BillToZip"			=> "30253",
-	"BillToCountry"	=> "US",
-	"ShipToName"		=> "John Smith",
+	"PONumber"			=> "1234-00",
+	"ShipToFirstName"	=> "John",
+	"ShipToLastName"	=> "Smith",
+	"ShipToCompany"	=> "ABC Lawn",
 	"ShipToAddress1"	=> "123 Peachtree St.",
 	"ShipToAddress2"	=> "",
 	"ShipToCity"		=> "Atlanta",
@@ -48,12 +42,11 @@ $fields = array(
 
 print_r($fields);
 echo "\n\n";
-
 $field_data = "";
 foreach ($fields as $key => $value)
 	$field_data .= "&$key=$value";
 
-
+exit;
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "$url/sendorder");
 curl_setopt($ch, CURLOPT_POST, true);
