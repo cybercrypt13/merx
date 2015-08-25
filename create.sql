@@ -404,6 +404,15 @@ Qty int unsigned not null comment 'how many of this model are in stock',
 Unique Key iModelID( ModelID, WarehouseID ) )
 engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'Model Stock Information';
 
+drop table if exists UnitModelCost;
+create table UnitModelCost(
+ModelID int unsigned not null comment 'links to UnitModels',
+DealerID int unsigned not null comment 'links to DealerCredentials',
+Cost decimal(13,3) not null comment 'Dealer specific cost for this unit',
+Unique Key iModelID( ModelID, DealerID ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'Dealer specific cost table for models';
+
+
 drop table if exists UnitVehicleTypes;
 create table UnitVehicleTypes(
 VehicleTypeID int unsigned not null auto_increment primary key, 
@@ -511,3 +520,9 @@ insert into ItemStock values( 5, 2, 55 );
 insert into ItemStock values( 5, 3, 24 );
 insert into ItemStock values( 5, 4, 10 );
 
+insert into UnitModel values( null, 1, '', 'CBR1000','','CBR1000',1,'2015',0,0,'',12000,14000,0,'');
+insert into UnitModelCost values( 1,1,11500);
+insert into UnitVehicleTypes values( null, 'Street' );
+insert into UnitModelStock values( 1, 1, 4 );
+insert into UnitModelStock values( 1, 2, 2 );
+insert into UnitModelStock values( 1, 3, 1 );

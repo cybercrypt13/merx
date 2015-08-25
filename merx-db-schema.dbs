@@ -730,6 +730,27 @@
 				<fk_column name="VehicleTypeID" pk="VehicleTypeID" />
 			</fk>
 		</table>
+		<table name="UnitModelCost" >
+			<column name="ModelID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to UnitModels]]></comment>
+			</column>
+			<column name="DealerID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
+				<comment><![CDATA[links to DealerCredentials]]></comment>
+			</column>
+			<column name="Cost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
+				<comment><![CDATA[Dealer specific cost for this unit]]></comment>
+			</column>
+			<index name="iModelID" unique="UNIQUE" >
+				<column name="ModelID" />
+				<column name="DealerID" />
+			</index>
+			<fk name="Fk_UnitModelCost" virtual="y" to_schema="merx" to_table="UnitModel" >
+				<fk_column name="ModelID" pk="ModelID" />
+			</fk>
+			<fk name="Fk_UnitModelCost_0" virtual="y" to_schema="merx" to_table="DealerCredentials" >
+				<fk_column name="DealerID" pk="DealerID" />
+			</fk>
+		</table>
 		<table name="UnitModelImages" >
 			<column name="ImageID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" autoincrement="y" regexp_nulls="0" />
 			<column name="ModelID" type="INT" length="10" jt="4" mandatory="y" unsigned="y" regexp_nulls="0" >
@@ -936,6 +957,7 @@
 		<entity schema="merx" name="UnitModel" color="aac6f2" x="780" y="765" />
 		<entity schema="merx" name="UnitModelStock" color="aac6f2" x="720" y="1110" />
 		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="945" y="60" />
+		<entity schema="merx" name="UnitModelCost" color="aac6f2" x="1140" y="840" />
 		<group name="Security" color="c4e0f9" >
 			<entity schema="merx" name="VendorCredentials" />
 			<entity schema="merx" name="AuthorizedBSVKeys" />
@@ -966,6 +988,7 @@
 			<entity schema="merx" name="UnitServiceBulletins" />
 			<entity schema="merx" name="UnitRebateLink" />
 			<entity schema="merx" name="UnitModelStock" />
+			<entity schema="merx" name="UnitModelCost" />
 		</group>
 	</layout>
 </project>
