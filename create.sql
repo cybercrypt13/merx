@@ -98,6 +98,14 @@ CREATE TABLE `Items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This tables holds the manufacturer/suppliers price file';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+drop table if exists ItemWhereUsed;
+create table ItemWhereUsed(
+ItemID int unsigned not null comment 'links to Items',
+ModelID int unsigned not null comment 'links to UnitModels',
+unique key iPrimary( ItemID, ModelID ) )
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Links Items to Models';
+
+
 DROP TABLE IF EXISTS `ItemCrossReference`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -222,6 +230,7 @@ DROP TABLE IF EXISTS `PurchaseOrderShipped`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PurchaseOrderShipped` (
   `ShippedID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for every shipping entry.',
+  ShipVendorID int unsigned not null comment 'links to ShippingVendors',
   `POItemID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the specific item in PuchaseOrderItems',
   `BoxID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the specific box in ShippedBoxes',
   `QtyShipped` int(11) NOT NULL DEFAULT '0' COMMENT 'The qty that were put in the box',
@@ -239,17 +248,37 @@ CREATE TABLE `PurchaseOrderShipped` (
 drop table if exists `PurchaseOrderUnits`;
 create table PurchaseOrderUnits( POUnitID int unsigned not null auto_increment primary key, 
 POID int unsigned not null comment 'links to PurchaseOrder table',
+ModelID int unsigned not null comment 'links to UnitModels',
 VendorID varchar(5) comment 'holds specific code for vendor', 
 OrderCode varchar(25) comment 'vendor specific part number for this unit', 
 ModelNumber varchar(50) comment 'vendor model number', 
 Year int unsigned default 0 comment 'year if available', 
 Colors text comment 'list of colors for unit', 
 Details text comment 'special notes', 
-Quantity int unsigned comment 'how many of this model is being ordered', 
-ForCustomer tinyint unsigned default 0 comment '0=for stock, 1=for customer' ) 
-engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit order information';
+Cost decimal(13,3) not null default 0 comment 'Cost of Each Unit', 
+ForCustomer tinyint unsigned default 0 comment '0=for stock, 1=for customer',
+SerialVin varchar(25) comment 'serial-vin number', 
+EstShipDate date comment 'when unit is estimated to be shipped',
+ShipCharge decimal(13,3) not null default 0 comment 'unit specific freight amount',
+TrackingNumber varchar( 50 ) comment 'tracking information if available',
+ShipVendorID tinyint unsigned not null default 0 comment 'links to ShippingVendors',
+key iPrimary( POID, ModelID) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit order information one unit per line';
 
 
+drop table if exists ShippingVendors;
+create table ShippingVendors(
+ShipVendorID int unsigned not null auto_increment primary key,
+ShipVendorName varchar( 50 ) comment 'who is the shipping vendor' )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'list of shipping vendors supported by this supplier';
+
+
+drop table if exists TableVersion;
+create table TableVersion(
+TableVersionID int unsigned not null comment 'what version has been run',
+UpdateRan datetime comment 'when the update got run',
+unique key iPrimary( TableVersionID ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds latest status of database updates to insure they dont run twice';
 
 --
 -- Table structure for table `PurchaseOrders`
@@ -283,9 +312,14 @@ CREATE TABLE `PurchaseOrders` (
   `DateCreated` datetime  COMMENT 'Stores the initial purchase order date received',
   `DateOrdered` datetime  COMMENT 'Stores the date the dealer physically placed the order',
   `DateLastModified` datetime  COMMENT 'Stores the date the order was last touched',
+  `DateLastStatus` datetime  COMMENT 'Stores the date the order was last pulled by dealer for status update',
   `DateProcessed` datetime  COMMENT 'Stores the date the order was pulled into supplier backend system',
   `DateFirstShipped` datetime  COMMENT 'Stores the date the first part was shipped out for the order',
   `DateFinalShipped` datetime  COMMENT 'Stores the date the last part was shipped out for the order',
+  ShippingCharge decimal(13,3) not null default 0 comment 'holds order shipping charge if exists',
+  PaybyDiscountDate date comment 'holds date if paid by to get additional discount',
+  PaybyDiscountAmount decimal(13,3) default 0 comment 'dollar amount of discount if paid by date',
+  PaybyDiscountPercent decimal(13,3) default 0 comment 'amount of percentage to discount if paid by date',
   PRIMARY KEY (`POID`),
   KEY `iClientPONumber` (`DealerID`,`PONumber`),
   KEY `iGetOrders` (`DateOrdered`,`Status`),
@@ -347,12 +381,71 @@ create table UnitModel( ModelID int unsigned not null auto_increment primary key
 VendorID int unsigned not null comment 'links to Vendor Table',
 OrderCode varchar(25) comment 'vendor specific part number for this unit', 
 ModelNumber varchar(50) comment 'vendor model number', 
+ModelName varchar(100) comment 'vendor model name', 
 ModelNumberNoFormat varchar(50) comment 'vendor model number stripped of all formatting', 
-VehicleType varchar(50) comment 'Street, Dirt, Atv, Car, Truck...', 
+VehicleTypeID int unsigned not null  comment 'links to UnitVehicleType Street, Dirt, Atv, Car, Truck...', 
 Year int unsigned default 0 comment 'year if available', 
+NLA tinyint unsigned default 0 comment '0=available, 1=no longer available', 
+CloseOut tinyint unsigned default 0 comment '0=not a closeout, 1=closeout and soon to be nla', 
 Colors text comment 'list of colors for unit', 
-Details text comment 'special notes') 
+Cost decimal(13,3) not null default 0 comment 'cost of unit',
+MSRP decimal(13,3) not null default 0 comment 'list price of unit',
+MAP decimal(13,3) default 0 comment 'if MAP price applies',
+Description text comment 'special notes',
+Unique Key iModelPrimary( ModelNumberNoFormat, VendorID ) ) 
 engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model information';
+
+
+drop table if exists UnitModelStock;
+create table UnitModelStock(
+ModelID int unsigned not null comment 'links to UnitModels',
+WarehouseID int unsigned not null comment 'links to Warehouses',
+Qty int unsigned not null comment 'how many of this model are in stock',
+Unique Key iModelID( ModelID, WarehouseID ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'Model Stock Information';
+
+drop table if exists UnitVehicleTypes;
+create table UnitVehicleTypes(
+VehicleTypeID int unsigned not null auto_increment primary key, 
+Name varchar(50) not null comment 'Vehicle Type Name',
+Unique Key iName( Name ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'Vehicle Types';
+
+drop table if exists UnitServiceBulletins;
+create table UnitServiceBulletins(
+BulletinID int unsigned not null auto_increment primary key, 
+Title varchar(50) not null comment 'Title of bulletin',
+Description text comment 'holds details about the bulletin',
+DatePosted date not null comment 'holds date bulletin was posted to site',
+URL varchar(300) comment 'URL to actual bulletin if exists',
+Key iName( Title ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'List of service bulletins';
+
+drop table if exists UnitServiceBulletinLink;
+create table UnitServiceBulletinLink(
+BulletinID int unsigned not null comment 'links to UnitServiceBulletins',
+ModelID int unsigned not null  comment 'Links to UnitModel',
+Unique Key iLink( ModelID, BulletinID ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'List of links to service bulletins';
+
+drop table if exists UnitRebates;
+create table UnitRebates(
+RebateID int unsigned not null auto_increment primary key, 
+Name varchar(50) not null comment 'Vehicle Type Name',
+Description text comment 'holds details about the Rebate',
+DateActive date not null comment 'holds date Rebate becomes active',
+DateExpired date not null comment 'holds date Rebate terminates',
+Amount decimal(13,3) not null comment 'amount of the rebate',
+DealerPercent decimal(13,3) not null comment 'percent of rebate for dealer to receive',
+Key iName( RebateID, Name ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'List of model rebates';
+
+drop table if exists UnitRebateLink;
+create table UnitRebateLink(
+ModelID int unsigned not null comment 'links to UnitModels',
+RebateID int unsigned not null comment 'links to UnitRebates',
+unique key iPrimary( ModelID, RebateID ) )
+engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'links models to rebates';
 
 drop table if exists `UnitModelImages`;
 create table UnitModelImages( ImageID int unsigned not null auto_increment primary key, 
