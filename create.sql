@@ -90,7 +90,7 @@ CREATE TABLE `Items` (
   `CloseOut` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Will not be available after inventory depleted 0 = false, 1 = true',
   `PriceCode` varchar(3) NOT NULL DEFAULT '' COMMENT 'Holds the price code that applies to this part',
   `Cost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the basic cost of the item',
-  `List` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the suggested retail price of the item',
+  `MSRP` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the suggested retail price of the item',
   `MAP` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This store the minimum advertise price of the item',
   `Category` varchar(50) NOT NULL DEFAULT '' COMMENT 'Hold category info',
   PRIMARY KEY (`ItemID`),
@@ -458,13 +458,15 @@ engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'links 
 drop table if exists `UnitModelImages`;
 create table UnitModelImages( ImageID int unsigned not null auto_increment primary key, 
 ModelID int unsigned not null comment 'links to Model Table',
-ImageURL varchar(100) comment 'URL to image of unit') 
+ImageURL varchar(100) comment 'URL to image of unit', 
+ImageSize tinyint unsigned not null comment '1=thumb, 2=medium, 3=large')
 engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model image urls';
 
 drop table if exists `ItemImages`;
 create table ItemImages( ImageID int unsigned not null auto_increment primary key, 
 ItemID int unsigned not null comment 'links to Model Table',
-ImageURL varchar(100) comment 'URL to image of unit') 
+ImageURL varchar(100) comment 'URL to image of unit', 
+ImageSize tinyint unsigned not null comment '1=thumb, 2=medium, 3=large')
 engine=innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci comment 'holds unit model image urls';
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -525,3 +527,6 @@ insert into UnitVehicleTypes values( null, 'Street' );
 insert into UnitModelStock values( 1, 1, 4 );
 insert into UnitModelStock values( 1, 2, 2 );
 insert into UnitModelStock values( 1, 3, 1 );
+
+insert into ItemImages values( null, 3, 'www.nizex.com',1);
+insert into ItemImages values( null, 3, 'www.nizex.com/test',2);
