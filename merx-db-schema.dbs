@@ -328,10 +328,6 @@
 			<column name="Quantity" type="INT" length="10" jt="4" >
 				<comment><![CDATA[Stores the quantity of parts ordered]]></comment>
 			</column>
-			<column name="OrderType" type="TINYINT" length="3" jt="-6" mandatory="y" regexp_nulls="0" >
-				<defo>2</defo>
-				<comment><![CDATA[1=For Customer, 2=For Stock, 3=Seasonal Order]]></comment>
-			</column>
 			<column name="FillStatus" type="TINYINT" length="3" jt="-6" mandatory="y" unsigned="y" regexp_nulls="0" >
 				<defo>0</defo>
 				<comment><![CDATA[0=ship what you have, 1=only ship if you can fill completely]]></comment>
@@ -425,10 +421,6 @@
 			</column>
 			<column name="Details" type="TEXT" length="65535" jt="-1" >
 				<comment><![CDATA[special notes]]></comment>
-			</column>
-			<column name="ForCustomer" type="TINYINT" length="3" jt="-6" unsigned="y" >
-				<defo>0</defo>
-				<comment><![CDATA[0=for stock, 1=for customer]]></comment>
 			</column>
 			<column name="Cost" type="DECIMAL" length="13" decimal="3" jt="3" mandatory="y" regexp_nulls="0" >
 				<defo>0.000</defo>
@@ -589,6 +581,10 @@
 			<column name="PaybyDiscountPercent" type="DECIMAL" length="13" decimal="3" jt="3" >
 				<defo>0.000</defo>
 				<comment><![CDATA[amount of percentage to discount if paid by date]]></comment>
+			</column>
+			<column name="OrderType" type="TINYINT" length="3" jt="-6" mandatory="y" regexp_nulls="0" >
+				<defo>2</defo>
+				<comment><![CDATA[1=Regular, 2=Seasonal Order]]></comment>
 			</column>
 			<index name="pk_PurchaseOrders" unique="PRIMARY_KEY" >
 				<column name="POID" />
@@ -941,7 +937,6 @@
 		<entity schema="merx" name="Vendors" color="aac6f2" x="270" y="465" />
 		<entity schema="merx" name="ItemCrossReference" color="aac6f2" x="315" y="1020" />
 		<entity schema="merx" name="DaysToFullfill" color="aac6f2" x="270" y="315" />
-		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="465" y="120" />
 		<entity schema="merx" name="Items" color="aac6f2" x="105" y="930" />
 		<entity schema="merx" name="PurchaseOrderItems" color="aac6f2" x="720" y="135" />
 		<entity schema="merx" name="TableVersion" color="aac6f2" x="45" y="570" />
@@ -958,6 +953,7 @@
 		<entity schema="merx" name="UnitModelStock" color="aac6f2" x="720" y="1110" />
 		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="945" y="60" />
 		<entity schema="merx" name="UnitModelCost" color="aac6f2" x="1140" y="840" />
+		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="465" y="120" />
 		<group name="Security" color="c4e0f9" >
 			<entity schema="merx" name="VendorCredentials" />
 			<entity schema="merx" name="AuthorizedBSVKeys" />
