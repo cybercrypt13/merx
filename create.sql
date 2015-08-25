@@ -191,7 +191,7 @@ CREATE TABLE `PurchaseOrderBackOrder` (
   `QtyPending` int(11) NOT NULL DEFAULT '0' COMMENT 'The qty pending shipment',
   `Cost` decimal(13,3) NOT NULL DEFAULT '0.000' COMMENT 'This stores the cost that the dealer will pay for this part',
   `EstShipDate` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Store the estimated ship date for the back ordered item',
-  `Note` varchar(100) comment 'holds any special note transferred back from vendor',
+  `ShipNote` varchar(100) comment 'holds any special note transferred back from vendor',
   PRIMARY KEY (`BackOrderID`),
   KEY `iPOItemID` (`POItemID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Stores items that are on backorder';
@@ -213,7 +213,8 @@ CREATE TABLE `PurchaseOrderItems` (
   `ItemID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the Items table',
   `VendorID` varchar(5) NOT NULL DEFAULT '' COMMENT 'The primary VendorID that was submitted on the PO',
   `Status` tinyint(3) NOT NULL DEFAULT 0 COMMENT '1=Superseded, 2=Obsolete, 3=Rejected',
-  `SupersessionID` varchar(30) comment 'holds supersession number if one exists',
+  `SupersessionID` int unsigned default 0 comment 'holds supersession number if shipped instead of original',
+  `CrossreferenceID` int unsigned default 0 comment 'holds cross reference number if shipped instead of original',
   PRIMARY KEY (`POItemID`),
   KEY `iPOID` (`POID`),
   KEY `iPOIDPartNumber` (`POID`,`ItemNumber`)
@@ -256,6 +257,7 @@ Details text comment 'special notes',
 Cost decimal(13,3) not null default 0 comment 'Cost of Each Unit', 
 SerialVin varchar(25) comment 'serial-vin number', 
 EstShipDate date comment 'when unit is estimated to be shipped',
+ShipNotes varchar(200) comment 'any specific backorder shipping details',
 ShipCharge decimal(13,3) not null default 0 comment 'unit specific freight amount',
 TrackingNumber varchar( 50 ) comment 'tracking information if available',
 ShipVendorID tinyint unsigned not null default 0 comment 'links to ShippingVendors',
@@ -314,7 +316,6 @@ CREATE TABLE `PurchaseOrders` (
   `DateFirstShipped` datetime  COMMENT 'Stores the date the first part was shipped out for the order',
   `DateFinalShipped` datetime  COMMENT 'Stores the date the last part was shipped out for the order',
   `OrderType` tinyint(3) NOT NULL DEFAULT 2 COMMENT '1=Regular, 2=Seasonal Order',
-  ShippingCharge decimal(13,3) not null default 0 comment 'holds order shipping charge if exists',
   PaybyDiscountDate date comment 'holds date if paid by to get additional discount',
   PaybyDiscountAmount decimal(13,3) default 0 comment 'dollar amount of discount if paid by date',
   PaybyDiscountPercent decimal(13,3) default 0 comment 'amount of percentage to discount if paid by date',
@@ -340,6 +341,8 @@ CREATE TABLE `ShippedBoxes` (
   ShipVendorID int unsigned not null comment 'links to ShippingVendors',
   `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
+  `ShipDate` Date  COMMENT 'Date Box was shipped By Vendor',
+  ShipCost decimal(13,3) not null default 0 comment 'holds order shipping charge if exists',
   PRIMARY KEY (`BoxID`),
   KEY `iTracking` (`TrackingNumber`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='This table stores the tracking data for each box shipped.';
