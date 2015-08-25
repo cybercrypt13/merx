@@ -230,7 +230,6 @@ DROP TABLE IF EXISTS `PurchaseOrderShipped`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PurchaseOrderShipped` (
   `ShippedID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ID for every shipping entry.',
-  ShipVendorID int unsigned not null comment 'links to ShippingVendors',
   `POItemID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the specific item in PuchaseOrderItems',
   `BoxID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Links to the specific box in ShippedBoxes',
   `QtyShipped` int(11) NOT NULL DEFAULT '0' COMMENT 'The qty that were put in the box',
@@ -339,6 +338,7 @@ CREATE TABLE `ShippedBoxes` (
   `WarehouseID` int(10) unsigned NOT NULL COMMENT 'links to warehouse table to show where packages shipped from',
   `BoxNumber` varchar(25) NOT NULL DEFAULT '1' COMMENT 'Stores the box number assigned by the vendor',
   `TrackingNumber` varchar(50) NOT NULL DEFAULT '' COMMENT 'Stores the boxes tracking number',
+  ShipVendorID int unsigned not null comment 'links to ShippingVendors',
   `VendorInvoiceNumber` varchar(20) NOT NULL DEFAULT '' COMMENT 'Stores the vendor''s invoice number',
   `DueDate` Date  COMMENT 'Due Date Returned By Vendor',
   PRIMARY KEY (`BoxID`),
