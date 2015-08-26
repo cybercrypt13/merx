@@ -440,6 +440,9 @@
 			<column name="EstShipDate" type="DATE" length="10" jt="91" >
 				<comment><![CDATA[when unit is estimated to be shipped]]></comment>
 			</column>
+			<column name="ShipDate" type="DATE" length="10" jt="91" >
+				<comment><![CDATA[when unit actually shipped]]></comment>
+			</column>
 			<column name="ShipNotes" type="VARCHAR" length="200" jt="12" >
 				<comment><![CDATA[any specific backorder shipping details]]></comment>
 			</column>
@@ -556,6 +559,9 @@
 			<column name="Discount" type="DECIMAL" length="9" decimal="2" jt="3" >
 				<defo>0.00</defo>
 				<comment><![CDATA[Holds any discounts sent back from vendor]]></comment>
+			</column>
+			<column name="ExpectedDelivery" type="DATE" length="10" jt="91" >
+				<comment><![CDATA[Used For Seasonal Orders to estimate when order will begin arriving]]></comment>
 			</column>
 			<column name="DateCreated" type="DATETIME" length="19" jt="93" >
 				<comment><![CDATA[Stores the initial purchase order date received]]></comment>
@@ -965,12 +971,12 @@
 		<entity schema="merx" name="UnitModel" color="aac6f2" x="765" y="780" />
 		<entity schema="merx" name="UnitModelStock" color="aac6f2" x="705" y="1125" />
 		<entity schema="merx" name="UnitModelCost" color="aac6f2" x="1125" y="855" />
-		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="615" y="120" />
 		<entity schema="merx" name="Items" color="aac6f2" x="105" y="945" />
 		<entity schema="merx" name="UnitModelImages" color="aac6f2" x="990" y="780" />
-		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="1095" y="60" />
 		<entity schema="merx" name="ShippedBoxes" color="aac6f2" x="825" y="375" />
 		<entity schema="merx" name="ShippingVendors" color="aac6f2" x="855" y="630" />
+		<entity schema="merx" name="PurchaseOrders" color="aac6f2" x="615" y="120" />
+		<entity schema="merx" name="PurchaseOrderUnits" color="aac6f2" x="1095" y="60" />
 		<group name="Security" color="c4e0f9" >
 			<entity schema="merx" name="VendorCredentials" />
 			<entity schema="merx" name="AuthorizedBSVKeys" />

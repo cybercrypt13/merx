@@ -257,6 +257,7 @@ Details text comment 'special notes',
 Cost decimal(13,3) not null default 0 comment 'Cost of Each Unit', 
 SerialVin varchar(25) comment 'serial-vin number', 
 EstShipDate date comment 'when unit is estimated to be shipped',
+ShipDate date comment 'when unit actually shipped',
 ShipNotes varchar(200) comment 'any specific backorder shipping details',
 ShipCharge decimal(13,3) not null default 0 comment 'unit specific freight amount',
 TrackingNumber varchar( 50 ) comment 'tracking information if available',
@@ -308,6 +309,7 @@ CREATE TABLE `PurchaseOrders` (
   `LastFour` char(4) NOT NULL DEFAULT '' COMMENT 'Last four of creditcard on file',
   `ShipMethod` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '0 = No method specified, 1 = VISA, 2 = Mastercard, 3 = American Express, 4 = Discover, 5 = NET',
   `Discount` decimal(9,2) default 0 comment 'Holds any discounts sent back from vendor',
+  `ExpectedDelivery` date  COMMENT 'Used For Seasonal Orders to estimate when order will begin arriving',
   `DateCreated` datetime  COMMENT 'Stores the initial purchase order date received',
   `DateOrdered` datetime  COMMENT 'Stores the date the dealer physically placed the order',
   `DateLastModified` datetime  COMMENT 'Stores the date the order was last touched',
@@ -533,3 +535,7 @@ insert into UnitModelStock values( 1, 3, 1 );
 
 insert into ItemImages values( null, 3, 'www.nizex.com',1);
 insert into ItemImages values( null, 3, 'www.nizex.com/test',2);
+insert into DaysToFullfill values(1,1,2);
+insert into DaysToFullfill values(1,2,5);
+insert into DaysToFullfill values(1,3,4);
+insert into DaysToFullfill values(1,4,3);
